@@ -28,51 +28,23 @@ export default class Pico extends Processor
   ////////////////////////////////////////////////////////////////////////
 
   // 'val' is the offset portion of the instruction.  Verify that it is
-  // a valid memory address.  Return true if not.
-  isBadOffset(op: string, val: number): boolean
+  // a valid memory address.  Throws an error if it is not.
+  private checkOkOffset(val: number)
   {
     if (val < 0 || val > 127)
     {
-      this.setMessage(op + ' address is missing or invalid', true);
-      return true;
+      throw 'address is missing or invalid';
     }
-    return false;
   }
 
   // 'addr' is an address into memory.  It should be pointing to an
-  // integer value.  Fetch that value.  If the return value is ERR
-  // (which is not a valid value), then the fetch failed (and an
-  // error message was printed)
-  fetchInt(op: string, addr: number): number
+  // integer value.  Fetch that value.  Throws an error if one was encountered.
+  private fetchInt(addr: number): number
   {
     let data = this.#memory.getValue(addr);
     if (data === '?')
     {
-      this.setMessage(op + ' is addressing uninitialized memory', true);
-      return ERR;
-    }
-    if (isNumeric(data))
-    {
-      return parseInt(data, 10);
-    }
-    this.setMessage(op + ' is addressing an instruction', true);
-    return ERR;
-  }
-
-  // 'addr' is an address into memory.  It should be pointing to an
-  // integer value.  Fetch that value.  If the return value is ERR
-  // (which is not a valid value), then the fetch failed (and an
-  // error message was printed).  This is almost identical to the
-  // previous function, but this is used to look up an indirect
-  // address.  The error messages are slightly different in this version.
-  fetchIndirect(op: string, addr: number): number
-  {
-    // this.#memory.setredhighlight(addr);
-    let data = this.#memory.getValue(addr);
-    if (data === '?')
-    {
-      this.setMessage(op + ' indirect pointer is not initialized', true);
-      return ERR;
+      throw 'addressing uninitialized memory at ' + addr;
     }
     if (isNumeric(data))
     {
@@ -80,32 +52,49 @@ export default class Pico extends Processor
     }
     else
     {
-      this.setMessage(op + ' indirect pointer is an instruction', true);
-      return ERR;
+      throw 'expected a number while addressing ' + addr
+      + ' but found an instruction instead';
     }
   }
 
-  // Get the accumulator's value as an integer.  Will return -4096
-  // if there was an error fetching this value.
-  fetchACC(op: string): number
+  // 'addr' is an address into memory.  It should be pointing to an
+  // integer value.  Fetch that value.  This is almost identical to the
+  // previous function, but this is used to look up an indirect
+  // address.  Throws an error if one is encountered.
+  private fetchIndirect(addr: number): number
   {
-    let a = this.#accumulator.value;
-    if (a === '?')
+    // this.#memory.setredhighlight(addr);
+    let data = this.#memory.getValue(addr);
+    if (data === '?')
     {
-      this.setMessage(op + ' ACC is not initialized', true);
-      return ERR;
+      throw 'indirectly addressing uninitialized memory at ' + addr;
     }
+    if (isNumeric(data))
+    {
+      return parseInt(data, 10);
+    }
+    else
+    {
+      throw 'expected a number while indirectly addressing ' + addr
+      + ' but found an instruction instead';
+    }
+  }
+
+  // Get the accumulator's value as an integer.  Throws an error if one is
+  // encountered.
+  private fetchACC(): number
+  {
     return this.#accumulator.valueAsNumber;
   }
 
   // Increment the PC (do a 'skip')
-  incPC()
+  private incPC()
   {
     this.#programCounter.valueAsNumber += 1;
   }
 
   // Do the logic of a AND-type instructions
-  andHelper(_op: string, aval: number, mval: number)
+  private andHelper(aval: number, mval: number)
   {
     let result = aval & mval & 4095;
     if (result > 2047)
@@ -117,7 +106,7 @@ export default class Pico extends Processor
   }
 
   // Do the logic of a TAD-type instructions
-  tadHelper(_op: string, aval: number, mval: number)
+  private tadHelper(aval: number, mval: number)
   {
     let result = aval + mval;
     this.#carryFlag.value = false;
@@ -142,164 +131,89 @@ export default class Pico extends Processor
 
   //----- AND
 
-  doAND(op: string, val: number)
+  private doAND(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
+    this.checkOkOffset(val);
     // this.#memory.set_blue_highlight(val);
-    let mval = this.fetchInt(op, val);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.andHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + val + '] is ANDed to ACC', false);
+    let mval = this.fetchInt(val);
+    let aval = this.fetchACC();
+    this.andHelper(aval, mval);
+    return '' + mval + ' from MEM[' + val + '] is ANDed to ACC';
   }
 
   //----- ANDI
 
-  doANDI(op: string, val: number)
+  private doANDI(_val: number): string
   {
     // Fetch the data based on the PC
     let addr = this.#programCounter.valueAsNumber;
     this.incPC();
     // mem.set_blue_highlight(addr);
-    let mval = this.fetchInt(op, addr);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.andHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + addr + '] is ANDed to ACC', false);
+    let mval = this.fetchInt(addr);
+    let aval = this.fetchACC();
+    this.andHelper(aval, mval);
+    return '' + mval + ' from MEM[' + addr + '] is ANDed to ACC';
   }
 
   //----- ANDR
 
-  doANDR(op: string, val: number)
+  private doANDR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
     // this.#memory.set_blue_highlight(addr);
-    let mval = this.fetchInt(op, addr);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.andHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + addr + '] is added to ACC', false);
+    let mval = this.fetchInt(addr);
+    let aval = this.fetchACC();
+    this.andHelper(aval, mval);
+    return '' + mval + ' from MEM[' + addr + '] is added to ACC';
   }
 
   //----- TAD
 
-  doTAD(op: string, val: number)
+  private doTAD(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
+    this.checkOkOffset(val);
     // this.#memory.set_blue_highlight(val);
-    let mval = this.fetchInt(op, val);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.tadHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + val + '] is added to ACC', false);
+    let mval = this.fetchInt(val);
+    let aval = this.fetchACC();
+    this.tadHelper(aval, mval);
+    return '' + mval + ' from MEM[' + val + '] is added to ACC';
   }
 
   //----- TADI
 
-  doTADI(op: string, val: number)
+  private doTADI(val: number): string
   {
     // Fetch the data based on the PC
     let addr = this.#programCounter.valueAsNumber;
     this.incPC();
     // this.#memory.set_blue_highlight(addr);
-    let mval = this.fetchInt(op, addr);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.tadHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + addr + '] is added to ACC', false);
+    let mval = this.fetchInt(addr);
+    let aval = this.fetchACC();
+    this.tadHelper(aval, mval);
+    return '' + mval + ' from MEM[' + addr + '] is added to ACC';
   }
 
   //----- TADR
 
-  doTADR(op: string, val: number)
+  private doTADR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
     // this.#memory.set_blue_highlight(addr);
-    let mval = this.fetchInt(op, addr);
-    if (mval === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
-    this.tadHelper(op, aval, mval);
-    this.setMessage('' + mval + ' from MEM[' + addr + '] is added to ACC', false);
+    let mval = this.fetchInt(addr);
+    let aval = this.fetchACC();
+    this.tadHelper(aval, mval);
+    return '' + mval + ' from MEM[' + addr + '] is added to ACC';
   }
 
   //----- ISZ
 
-  doISZ(op: string, val: number)
+  private doISZ(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
+    this.checkOkOffset(val);
     // this.#memory.set_blue_highlight(val);
-    let mval = this.fetchInt(op, val);
-    if (mval === ERR)
-    {
-      return;
-    }
+    let mval = this.fetchInt(val);
     mval++;
     if (mval > 2047)
     {
@@ -309,33 +223,22 @@ export default class Pico extends Processor
     if (mval === 0)
     {
       this.incPC();
-      this.setMessage('The value at MEM[' + val + '] was incremented.  It is now zero so the next instruction is skipped', false);
+      return 'The value at MEM[' + val + '] was incremented.  It is now zero so the next instruction is skipped';
     }
     else
     {
-      this.setMessage('The value at MEM[' + val + '] was incremented.  It is not zero so the next instruction is not skipped', false);
+      return 'The value at MEM[' + val + '] was incremented.  It is not zero so the next instruction is not skipped';
     }
   }
 
   //----- ISZR
 
-  doISZR(op: string, val: number)
+  private doISZR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
     // this.#memory.set_blue_highlight(addr);
-    let mval = this.fetchInt(op, addr);
-    if (mval === ERR)
-    {
-      return;
-    }
+    let mval = this.fetchInt(addr);
     mval++;
     if (mval > 2047)
     {
@@ -345,233 +248,146 @@ export default class Pico extends Processor
     if (mval === 0)
     {
       this.incPC();
-      this.setMessage('The value at MEM[' + addr + '] was incremented.  It is now zero so the next instruction is skipped', false);
+      return 'The value at MEM[' + addr + '] was incremented.  It is now zero so the next instruction is skipped';
     }
     else
     {
-      this.setMessage('The value at MEM[' + addr + '] was incremented.  It is not zero so the next instruction is not skipped', false);
+      return 'The value at MEM[' + addr + '] was incremented.  It is not zero so the next instruction is not skipped';
     }
   }
 
   //----- DCA
 
-  doDCA(op: string, val: number)
+  private doDCA(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let aval = this.fetchACC();
     this.#memory.setValue(val, '' + aval);
     // this.#memory.set_blue_highlight(val);
     this.#accumulator.valueAsNumber = 0;
-    this.setMessage('The value in ACC is stored to MEM[' + val + '], ACC is cleared', false);
+    return 'The value in ACC is stored to MEM[' + val + '], ACC is cleared';
   }
 
   //----- DCAR
 
-  doDCAR(op: string, val: number)
+  private doDCAR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
-    let aval = this.fetchACC(op);
-    if (aval === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
+    let aval = this.fetchACC();
     this.#memory.setValue(addr, '' + aval);
     // this.#memory.set_blue_highlight(addr);
     // acc.set_value(0);
-    this.setMessage('The value in ACC is indirectly stored to MEM[' + addr + '], ACC is cleared', false);
+    return 'The value in ACC is indirectly stored to MEM[' + addr + '], ACC is cleared';
   }
 
   //----- JMS
 
-  doJMS(op: string, val: number)
+  private doJMS(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
+    this.checkOkOffset(val);
     this.#memory.setValue(val, this.#programCounter.value);
     // this.#memory.set_red_highlight(val);
     this.#programCounter.valueAsNumber = val + 1;
-    this.setMessage('The processor has jumped to subroutine at location ' + val, false);
+    return 'The processor has jumped to subroutine at location ' + val;
   }
 
   //----- JMSR
 
-  doJMSR(op: string, val: number)
+  private doJMSR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
     this.#memory.setValue(addr, this.#programCounter.value);
     // this.#memory.set_red_highlight(addr);
     this.#programCounter.valueAsNumber = addr + 1;
     // this.#memory.set_blue_highlight(addr + 1);
-    this.setMessage('The processor has indirectly jumped to subroutine at location ' + addr, false);
+    return 'The processor has indirectly jumped to subroutine at location ' + addr;
   }
 
   //----- JMP
 
-  doJMP(op: string, val: number)
+  private doJMP(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
+    this.checkOkOffset(val);
     this.#programCounter.valueAsNumber = val;
     // mem.set_blue_highlight(val);
-    this.setMessage('The processor has jumped to location ' + val, false);
+    return 'The processor has jumped to location ' + val;
   }
 
   //----- JMPR
 
-  doJMPR(op: string, val: number)
+  private doJMPR(val: number): string
   {
-    if (this.isBadOffset(op, val))
-    {
-      return;
-    }
-    let addr = this.fetchIndirect(op, val);
-    if (addr === ERR)
-    {
-      return;
-    }
+    this.checkOkOffset(val);
+    let addr = this.fetchIndirect(val);
     this.#programCounter.valueAsNumber = addr;
     // this.#memory.set_blue_highlight(addr);
-    this.setMessage('The processor has indirectly jumped to location ' + addr, false);
+    return 'The processor has indirectly jumped to location ' + addr;
   }
 
   //----- Conditional skip
 
-  doCondSkip(flag: boolean, desired: boolean, name: string)
+  private doCondSkip(flag: boolean, desired: boolean, name: string): string
   {
     if (flag === desired)
     {
       this.incPC();
       let val = (desired ? 'ON' : 'OFF');
-      this.setMessage('The ' + name + ' flag is ' + val + ' so the next instruction is skipped', false);
+      return 'The ' + name + ' flag is ' + val + ' so the next instruction is skipped';
     }
     else
     {
       let val = (desired ? 'OFF' : 'ON');
-      this.setMessage('The ' + name + ' flag is ' + val + ' so the next instruction is not skipped', false);
+      return 'The ' + name + ' flag is ' + val + ' so the next instruction is not skipped';
     }
   }
 
-  step()
+  private doInstruction(opcode: string, immediate: number): string
   {
-    // Get the PC value, then increment the PC
-    let addr = this.#programCounter.valueAsNumber;
-    this.incPC();
-
-    // Look up the instruction in memory, send to IR
-    if (addr < 0 || addr > 127)
-    {
-      this.setMessage('PC addressed outside of memory', true);
-      return;
-    }
-    // this.#memory.clear_highlights();
-    // this.#memory.set_green_highlight(addr);
-    let inst = this.#memory.getValue(addr);
-    this.#instructionRegister.value = inst;
-    if (inst === '?')
-    {
-      this.setMessage('PC is addressing uninitialized memory', true);
-      return;
-    }
-
-    // Split the instruction into opcode and address.  The address
-    // will be -1 if the opcode had no address.
-    let arr = inst.split(' ');
-    let op = arr[0];
-    let val = -1;
-    if (arr.length > 1)
-    {
-      val = parseInt(arr[1], 10);
-    }
-
     let value;
-
     // Run the instructions with no memory addresses
-    switch (op)
+    switch (opcode)
     {
       case 'AND':
-        this.doAND(op, val);
-        return;
+        return this.doAND(immediate);
       case 'ANDI':
-        this.doANDI(op, val);
-        return;
+        return this.doANDI(immediate);
       case 'ANDR':
-        this.doANDR(op, val);
-        return;
+        return this.doANDR(immediate);
       case 'TAD':
-        this.doTAD(op, val);
-        return;
+        return this.doTAD(immediate);
       case 'TADI':
-        this.doTADI(op, val);
-        return;
+        return this.doTADI(immediate);
       case 'TADR':
-        this.doTADR(op, val);
-        return;
+        return this.doTADR(immediate);
       case 'ISZ':
-        this.doISZ(op, val);
-        return;
+        return this.doISZ(immediate);
       case 'ISZR':
-        this.doISZR(op, val);
-        return;
+        return this.doISZR(immediate);
       case 'DCA':
-        this.doDCA(op, val);
-        return;
+        return this.doDCA(immediate);
       case 'DCAR':
-        this.doDCAR(op, val);
-        return;
+        return this.doDCAR(immediate);
       case 'JMS':
-        this.doJMS(op, val);
-        return;
+        return this.doJMS(immediate);
       case 'JMSR':
-        this.doJMSR(op, val);
-        return;
+        return this.doJMSR(immediate);
       case 'JMP':
-        this.doJMP(op, val);
-        return;
+        return this.doJMP(immediate);
       case 'JMPR':
-        this.doJMPR(op, val);
-        return;
+        return this.doJMPR(immediate);
       case 'NOP':
-        this.setMessage('No operation is performed', false);
-        return;
+        return 'No operation is performed';
       case 'HLT':
         this.halt();
-        this.setMessage('The processor has halted', false);
-        return;
+        return 'The processor has halted';
       case 'CLA':
         this.#accumulator.valueAsNumber = 0;
-        this.setMessage('ACC is cleared', false);
-        return;
+        return 'ACC is cleared';
       case 'STA':
         this.#accumulator.valueAsNumber = -1;
-        this.setMessage('ACC is set to -1', false);
-        return;
+        return 'ACC is set to -1';
       case 'IAC':
         value = this.#accumulator.valueAsNumber + 1;
         this.#carryFlag.value = false;
@@ -583,8 +399,7 @@ export default class Pico extends Processor
         this.#accumulator.valueAsNumber = value;
         this.#zeroFlag.value = value === 0;
         this.#negFlag.value = value < 0;
-        this.setMessage('ACC incremented', false);
-        return;
+        return 'ACC incremented';
       case 'RAL':
         value = this.#accumulator.valueAsNumber & 4095;
         value = value << 1;
@@ -599,8 +414,7 @@ export default class Pico extends Processor
           value -= 4096;
         }
         this.#accumulator.valueAsNumber = value;
-        this.setMessage('ACC rotated left through carry', false);
-        return;
+        return 'ACC rotated left through carry';
       case 'RAR':
         value = this.#accumulator.valueAsNumber & 4095;
         if (this.#carryFlag.value)
@@ -614,8 +428,7 @@ export default class Pico extends Processor
           value -= 4096;
         }
         this.#accumulator.valueAsNumber = value;
-        this.setMessage('ACC rotated right through carry', false);
-        return;
+        return 'ACC rotated right through carry';
       case 'CMA':
         value = this.#accumulator.valueAsNumber;
         value = ~value;
@@ -624,8 +437,7 @@ export default class Pico extends Processor
           value = -2048;
         }
         this.#accumulator.valueAsNumber = value;
-        this.setMessage('ACC is complemented', false);
-        return;
+        return 'ACC is complemented';
       case 'CIA':
         value = this.#accumulator.valueAsNumber;
         value = -value;
@@ -634,58 +446,84 @@ export default class Pico extends Processor
           value = -2048;
         }
         this.#accumulator.valueAsNumber = value;
-        this.setMessage('ACC is negated', false);
-        return;
+        return 'ACC is negated';
       case 'CLC':
         this.#carryFlag.value = false;
-        this.setMessage('The Carry flag is cleared', false);
-        return;
+        return 'The Carry flag is cleared';
       case 'STC':
         this.#carryFlag.value = true;
-        this.setMessage('The Carry flag is set', false);
-        return;
+        return 'The Carry flag is set';
       case 'CMC':
         this.#carryFlag.value = !this.#carryFlag.value;
-        this.setMessage('The Carry flag is toggled', false);
-        return;
+        return 'The Carry flag is toggled';
       case 'SKP':
         this.incPC();
-        this.setMessage('The next instruction is skipped', false);
-        return;
+        return 'The next instruction is skipped';
       case 'SCC':
-        this.doCondSkip(this.#carryFlag.value, false, 'Carry');
-        return;
+        return this.doCondSkip(this.#carryFlag.value, false, 'Carry');
       case 'SCS':
-        this.doCondSkip(this.#carryFlag.value, true, 'Carry');
-        return;
+        return this.doCondSkip(this.#carryFlag.value, true, 'Carry');
       case 'SZC':
-        this.doCondSkip(this.#zeroFlag.value, false, 'Zero');
-        return;
+        return this.doCondSkip(this.#zeroFlag.value, false, 'Zero');
       case 'SZS':
-        this.doCondSkip(this.#zeroFlag.value, true, 'Zero');
-        return;
+        return this.doCondSkip(this.#zeroFlag.value, true, 'Zero');
       case 'SNC':
-        this.doCondSkip(this.#negFlag.value, false, 'Negative');
-        return;
+        return this.doCondSkip(this.#negFlag.value, false, 'Negative');
       case 'SNS':
-        this.doCondSkip(this.#negFlag.value, true, 'Negative');
-        return;
+        return this.doCondSkip(this.#negFlag.value, true, 'Negative');
       case 'SWP':
         value = this.#accumulator.value;
         this.#accumulator.value = this.#qReg.value;
         this.#qReg.value = value;
-        this.setMessage('The values in ACC and Q are swapped', false);
-        return;
+        return 'The values in ACC and Q are swapped';
       case 'MQA':
         this.#accumulator.value = this.#qReg.value;
-        this.setMessage('The value in Q is copied to ACC', false);
-        return;
+        return 'The value in Q is copied to ACC';
       case 'MQL':
         this.#qReg.value = this.#accumulator.value;
-        this.setMessage('The value in ACC is copied to Q', false);
-        return;
+        return 'The value in ACC is copied to Q';
       default:
-        break;
+        throw 'Invalid instruction ' + opcode;
+    }
+  }
+
+  protected doStep(): string
+  {
+    // Get the PC value, then increment the PC
+    let addr = this.#programCounter.valueAsNumber;
+    this.incPC();
+
+    // Look up the instruction in memory, send to IR
+    if (addr < 0 || addr > 127)
+    {
+      throw 'PC addressed outside of memory';
+    }
+    // this.#memory.clear_highlights();
+    // this.#memory.set_green_highlight(addr);
+    let inst = this.#memory.getValue(addr);
+    this.#instructionRegister.value = inst;
+    if (inst === '?')
+    {
+      throw 'PC is addressing uninitialized memory';
+    }
+
+    // Split the instruction into opcode and address.  The address
+    // will be -1 if the opcode had no address.
+    let arr = inst.split(' ');
+    let op = arr[0];
+    let val = -1;
+    if (arr.length > 1)
+    {
+      val = parseInt(arr[1], 10);
+    }
+
+    try
+    {
+      return this.doInstruction(op, val);
+    }
+    catch (error)
+    {
+      throw 'Error while performing "' + op + '" instruction: ' + error;
     }
   }
 }

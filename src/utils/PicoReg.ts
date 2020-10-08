@@ -15,6 +15,10 @@ export default class PicoReg
 	{
     this.#label = label;
   };
+
+  get initialized(): boolean {
+    return this.#value !== '?';
+  }
   
   set value(value: string) {
     this.#value = value;
@@ -30,9 +34,12 @@ export default class PicoReg
 
   // Throws an exception if this register is not holding a number.
   get valueAsNumber(): number {
+    if (!this.initialized) {
+      throw this.#label + ' is not initialized'
+    }
     let value = parseInt(this.#value);
     if (isNaN(value)) {
-      throw this.#label + ' contains "' + this.#value + '", which is not a number.';
+      throw this.#label + ' contains "' + this.#value + '", expected a number';
     } else {
       return value;
     }

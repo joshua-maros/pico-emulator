@@ -1,5 +1,5 @@
 // src/utils/processor.js - List of all the items in the processor
-export default class Processor
+export default abstract class Processor
 {
   // Are we 'running' the code for a processor?
   #running = false;
@@ -10,9 +10,6 @@ export default class Processor
   // The processor calls this function when its state has changed,
   // causing the view to be recomputed:
   #onChange = () => { };
-  // To implement running, this callback should be set: it is the
-  // code that computes the next state of the processor.
-  #onStep = () => { };
 
   // For a 'datapath' version of the processor, we have an array of
   // opcodes, an array of possible decoder cycles, an array of
@@ -32,7 +29,8 @@ export default class Processor
   // True if the last message describes an error rather than a success.
   #lastMessageWasError = false;
 
-  setMessage(message: string, isError: boolean) {
+  setMessage(message: string, isError: boolean)
+  {
     this.#lastMessage = message;
     this.#lastMessageWasError = isError;
   }
@@ -44,7 +42,6 @@ export default class Processor
     this.#fast = false;
     this.#timer = undefined;
     this.#onChange = () => { };
-    this.#onStep = () => { };
     this.#opcodes = [];
     this.#cycles = [];
     this.#controls = [];
@@ -56,11 +53,6 @@ export default class Processor
   set onChange(value: () => void)
   {
     this.#onChange = value;
-  }
-
-  set onStep(value: () => void)
-  {
-    this.#onStep = value;
   }
 
 
@@ -190,11 +182,25 @@ export default class Processor
     }
   }
 
-  tick()
+  // Stop the current 'run' of the processor
+  halt()
+  {
+    this.#running = false;
+  }
+
+  private tick()
   {
     clearTimeout(this.#timer);
     this.#timer = undefined;
-    this.#onStep();
+    try
+    {
+      let message = this.doStep();
+      this.setMessage(message, false);
+    }
+    catch (error)
+    {
+      this.setMessage(error, true);
+    }
     this.#onChange();
     if (this.#running)
     {
@@ -203,11 +209,10 @@ export default class Processor
     }
   }
 
-  // Stop the current 'run' of the processor
-  halt()
-  {
-    this.#running = false;
-  }
+  // This should be overridden by subclasses to advance the processor by one
+  // step each time it is called. Return a string describing what happened 
+  // during the step. If an error is encountered, throw a description of it.
+  protected abstract doStep(): string;
 
   // When we change the opcode, cycle, or next, this is called to update
   // the status message.
