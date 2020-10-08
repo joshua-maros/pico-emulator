@@ -1,0 +1,25 @@
+.root {
+  max-width: 50em;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-column-gap: 2em;
+  column-gap: 2em;
+  margin: auto;
+}
+
+.left_controls {
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  height: fit-content;
+  grid-column-gap: 0.5em;
+  column-gap: 0.5em;
+  grid-row-gap: 0.5em;
+  row-gap: 0.5em;
+}
+
+.label {
+  text-align: right;
+  height: min-content;
+  margin-top: auto;
+  margin-bottom: auto;
+}

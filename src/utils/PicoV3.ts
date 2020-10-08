@@ -4,6 +4,8 @@ import Flag from './PicoFlag';
 import Memory from './PicoMemory';
 import Processor from './Processor';
 import Reg from './PicoReg';
+import PicoReg from './PicoReg';
+import PicoFlag from './PicoFlag';
 
 function isNumeric(value: string): boolean
 {
@@ -23,9 +25,16 @@ export default class Pico extends Processor
   #zeroFlag = new Flag('ZERO');
   #negFlag = new Flag('NEG');
 
-  get memory(): Memory {
-    return this.#memory;
-  }
+  get memory(): Memory { return this.#memory; }
+
+  get accumulator(): PicoReg { return this.#accumulator; }
+  get programCounter(): PicoReg { return this.#programCounter; }
+  get instructionRegister(): PicoReg { return this.#instructionRegister; }
+  get qReg(): PicoReg { return this.#qReg; }
+
+  get carryFlag(): PicoFlag { return this.#carryFlag; }
+  get zeroFlag(): PicoFlag { return this.#zeroFlag; }
+  get negFlag(): PicoFlag { return this.#negFlag; }
 
   ////////////////////////////////////////////////////////////////////////
   // Helper functions
