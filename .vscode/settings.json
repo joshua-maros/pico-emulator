@@ -1,0 +1,7 @@
+{
+    "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+    "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
+    "javascript.preferences.quoteStyle": "single",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2
+}
