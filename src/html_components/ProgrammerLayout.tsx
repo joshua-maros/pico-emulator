@@ -142,13 +142,13 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             <div />
             <button onClick={() => pico.step()}>Step</button>
             <div />
-            <button>Run</button>
+            <button onClick={() => pico.startRunning(false)}>Run</button>
             <div />
-            <button>Run Fast</button>
+            <button onClick={() => pico.startRunning(true)}>Run Fast</button>
             <div />
-            <button>Stop</button>
+            <button onClick={() => pico.halt()}>Stop</button>
             <div />
-            <button>Reset</button>
+            <button onClick={() => pico.reset()}>Reset</button>
 
             <div />
             <div style={{ height: '1em' }} />

@@ -183,7 +183,10 @@ export default abstract class Processor
   // Stop the current 'run' of the processor
   halt()
   {
-    this.#running = false;
+    if (this.#running) {
+      clearTimeout(this.#timer);
+      this.#running = false;
+    }
   }
 
   // Perform a single step and nothing else.
@@ -207,7 +210,7 @@ export default abstract class Processor
     this.step();
     if (this.#running)
     {
-      let speed = this.#fast ? 500 : 2500;
+      let speed = this.#fast ? 200 : 2000;
       this.#timer = window.setTimeout(() => this.tick(), speed);
     }
   }
@@ -216,6 +219,17 @@ export default abstract class Processor
   // step each time it is called. Return a string describing what happened 
   // during the step. If an error is encountered, throw a description of it.
   protected abstract doStep(): string;
+
+  reset() {
+    this.halt();
+    this.doReset();
+    this.setMessage("Processor reset", false);
+    this.#onChange();
+  }
+
+  // This should be overridden by subclasses to reset the processor to its 
+  // initial state.
+  protected abstract doReset(): void;
 
   // When we change the opcode, cycle, or next, this is called to update
   // the status message.
