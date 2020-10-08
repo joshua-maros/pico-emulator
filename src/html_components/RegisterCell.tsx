@@ -4,11 +4,25 @@ import React from 'react';
 import PicoReg from '../utils/PicoReg';
 import style from './RegisterCell.module.css';
 
-export default class RegisterCell extends React.Component<{ reg: PicoReg }> {
+type Props = {
+  reg: PicoReg,
+  onClick: () => void,
+  focused: boolean,
+}
+
+export default class RegisterCell extends React.Component<Props> {
   render()
   {
     return (
-      <div className={style.root}>{this.props.reg.value}</div>
+      <div 
+        onClick={_e => this.props.onClick()} 
+        className={
+          style.root
+          + (this.props.focused ? ' ' + style.focused : '')
+        }
+      >
+        {this.props.reg.value}
+      </div>
     )
   }
 }

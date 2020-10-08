@@ -1,10 +1,27 @@
 .root {
+  display: grid;
   max-width: 50em;
+  margin: auto;
+  grid-row-gap: 1em;
+  row-gap: 1em;
+}
+
+.register_editor {
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-column-gap: 2em;
   column-gap: 2em;
-  margin: auto;
+}
+
+.register_editor button {
+  white-space: nowrap;
+}
+
+.processor {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-column-gap: 2em;
+  column-gap: 2em;
 }
 
 .left_controls {
@@ -22,4 +39,18 @@
   height: min-content;
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.info_message {
+  margin: -0.5em;
+  padding: 0.5em;
+  color: var(--info-text);
+  background: var(--info-text-bg);
+}
+
+.error_message {
+  margin: -0.5em;
+  padding: 0.5em;
+  color: var(--error-text);
+  background: var(--error-text-bg);
 }

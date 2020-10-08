@@ -14,6 +14,10 @@ export default class PicoReg
     this.#label = label;
   };
 
+  get label(): string {
+    return this.#label;
+  }
+
   get initialized(): boolean {
     return this.#value !== '?';
   }

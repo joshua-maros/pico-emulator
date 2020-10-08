@@ -1,6 +1,14 @@
 :root {
   --cell-border-weight: 2px;
   --cell-padding: 0.2em;
+
+  --neutral-bg: #EEE;
+  --selected-bg: rgb(187, 233, 255);
+
+  --info-text: rgb(0, 58, 121);
+  --info-text-bg: rgb(210, 241, 255);
+  --error-text: rgb(89, 0, 0);
+  --error-text-bg: rgb(255, 211, 211);
 }
 
 body {

@@ -1,6 +1,10 @@
 .root {
-  background: #eee;
+  background: var(--neutral-bg);
   text-align: right;
   padding: var(--cell-padding);
   border: var(--cell-border-weight) solid black;
+}
+
+.focused {
+  background: var(--selected-bg);
 }

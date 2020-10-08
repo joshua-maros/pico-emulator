@@ -25,9 +25,17 @@ export default abstract class Processor
 
   // A message describing either the most recent operation the processor 
   // completed or  error the processor encountered.
-  #lastMessage: string | null = null;
+  #lastMessage = "Processor initialized";
   // True if the last message describes an error rather than a success.
   #lastMessageWasError = false;
+
+  get lastMessage(): string {
+    return this.#lastMessage;
+  }
+
+  get lastMessageWasError(): boolean {
+    return this.#lastMessageWasError;
+  }
 
   setMessage(message: string, isError: boolean)
   {
@@ -162,16 +170,6 @@ export default abstract class Processor
   //   return result;
   // }
 
-  stopRunning()
-  {
-    if (this.#running)
-    {
-      this.#running = false;
-      clearTimeout(this.#timer);
-      this.#timer = undefined;
-    }
-  }
-
   startRunning(fast: boolean)
   {
     this.#fast = fast;
@@ -188,10 +186,8 @@ export default abstract class Processor
     this.#running = false;
   }
 
-  private tick()
-  {
-    clearTimeout(this.#timer);
-    this.#timer = undefined;
+  // Perform a single step and nothing else.
+  step() {
     try
     {
       let message = this.doStep();
@@ -202,6 +198,13 @@ export default abstract class Processor
       this.setMessage(error, true);
     }
     this.#onChange();
+  }
+
+  private tick()
+  {
+    clearTimeout(this.#timer);
+    this.#timer = undefined;
+    this.step();
     if (this.#running)
     {
       let speed = this.#fast ? 500 : 2500;

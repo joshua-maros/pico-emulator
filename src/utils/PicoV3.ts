@@ -25,6 +25,12 @@ export default class Pico extends Processor
   #zeroFlag = new Flag('ZERO');
   #negFlag = new Flag('NEG');
 
+  constructor()
+  {
+    super();
+    this.#programCounter.valueAsNumber = 0;
+  }
+
   get memory(): Memory { return this.#memory; }
 
   get accumulator(): PicoReg { return this.#accumulator; }
