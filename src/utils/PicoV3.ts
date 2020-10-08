@@ -45,7 +45,7 @@ export default class Pico extends Processor
   // integer value.  Fetch that value.  Throws an error if one was encountered.
   private fetchInt(addr: number): number
   {
-    let data = this.#memory.getValue(addr);
+    let data = this.#memory.get(addr).value;
     if (data === '?')
     {
       throw 'addressing uninitialized memory at ' + addr;
@@ -68,7 +68,7 @@ export default class Pico extends Processor
   private fetchIndirect(addr: number): number
   {
     // this.#memory.setredhighlight(addr);
-    let data = this.#memory.getValue(addr);
+    let data = this.#memory.get(addr).value;
     if (data === '?')
     {
       throw 'indirectly addressing uninitialized memory at ' + addr;
@@ -223,7 +223,7 @@ export default class Pico extends Processor
     {
       mval -= 4096;
     }
-    this.#memory.setValue(val, '' + mval);
+    this.#memory.get(val).valueAsNumber = mval;
     if (mval === 0)
     {
       this.incPC();
@@ -248,7 +248,7 @@ export default class Pico extends Processor
     {
       mval -= 4096;
     }
-    this.#memory.setValue(addr, '' + mval);
+    this.#memory.get(addr).valueAsNumber = mval;
     if (mval === 0)
     {
       this.incPC();
@@ -266,7 +266,7 @@ export default class Pico extends Processor
   {
     this.checkOkOffset(val);
     let aval = this.fetchACC();
-    this.#memory.setValue(val, '' + aval);
+    this.#memory.get(val).valueAsNumber = aval;
     // this.#memory.set_blue_highlight(val);
     this.#accumulator.valueAsNumber = 0;
     return 'The value in ACC is stored to MEM[' + val + '], ACC is cleared';
@@ -279,7 +279,7 @@ export default class Pico extends Processor
     this.checkOkOffset(val);
     let addr = this.fetchIndirect(val);
     let aval = this.fetchACC();
-    this.#memory.setValue(addr, '' + aval);
+    this.#memory.get(addr).valueAsNumber = aval;
     // this.#memory.set_blue_highlight(addr);
     // acc.set_value(0);
     return 'The value in ACC is indirectly stored to MEM[' + addr + '], ACC is cleared';
@@ -290,7 +290,7 @@ export default class Pico extends Processor
   private doJMS(val: number): string
   {
     this.checkOkOffset(val);
-    this.#memory.setValue(val, this.#programCounter.value);
+    this.#memory.get(val).value = this.#programCounter.value;
     // this.#memory.set_red_highlight(val);
     this.#programCounter.valueAsNumber = val + 1;
     return 'The processor has jumped to subroutine at location ' + val;
@@ -302,7 +302,7 @@ export default class Pico extends Processor
   {
     this.checkOkOffset(val);
     let addr = this.fetchIndirect(val);
-    this.#memory.setValue(addr, this.#programCounter.value);
+    this.#memory.get(addr).value = this.#programCounter.value;
     // this.#memory.set_red_highlight(addr);
     this.#programCounter.valueAsNumber = addr + 1;
     // this.#memory.set_blue_highlight(addr + 1);
@@ -504,7 +504,7 @@ export default class Pico extends Processor
     }
     // this.#memory.clear_highlights();
     // this.#memory.set_green_highlight(addr);
-    let inst = this.#memory.getValue(addr);
+    let inst = this.#memory.get(addr).value;
     this.#instructionRegister.value = inst;
     if (inst === '?')
     {

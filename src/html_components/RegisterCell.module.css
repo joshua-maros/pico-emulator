@@ -1,0 +1,6 @@
+.root {
+  background: #eee;
+  text-align: right;
+  padding: var(--cell-padding);
+  border: var(--cell-border-weight) solid black;
+}

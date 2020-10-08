@@ -1,33 +1,25 @@
+/* eslint no-throw-literal: "off" */
+
 // src/utils/PicoMemory.js - The memory for the processor
-// PicoMemory items have the following:
-//    An ID to locate the item
-//    A key for the MemoryView
-//    A label
-//    A location on the screen
-//    A length
-//    An array of values
+// Stores an array of PicoReg objects, one for each memory location.
+
+import PicoReg from "./PicoReg";
 
 export default class PicoMemory
 {
-  #data: Array<string>;
-	constructor(length: number)
-	{
-    this.#data = new Array(length).fill('?');
-	};
-
-	/*
-	 * Set the value of the register
-	 */
-	setValue(idx: number, val: string)
-	{
-		this.#data[idx] = val;
-	};
-
-  /*
-   * Return the value of the register
-   */
-  getValue(idx: number): string
+  #data: Array<PicoReg>;
+  constructor(length: number)
   {
+    this.#data = new Array(length).fill(0).map(
+      (_value, index) => new PicoReg(`MEM[${index}]`)
+    );
+  };
+
+  get(idx: number): PicoReg
+  {
+    if (idx >= this.#data.length) {
+      throw `${idx} is not a valid memory address`;
+    }
     return this.#data[idx];
   }
 };

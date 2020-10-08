@@ -1,11 +1,18 @@
 .root {
   display: grid;
   grid-template-columns: 2em 1fr 1fr 1fr 1fr;
-  margin-right: 2px;
-  margin-bottom: 2px;
+  margin-right: var(--cell-border-weight);
+  margin-bottom: var(--cell-border-weight);
+}
+
+.root > * {
+  margin-right: calc(-1 * var(--cell-border-weight));
+  margin-bottom: calc(-1 * var(--cell-border-weight));
 }
 
 .label {
   text-align: right;
-  padding: 0.2em;
+  padding: var(--cell-padding);
+  margin: 0;
+  margin-top: var(--cell-border-weight); 
 }

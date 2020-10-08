@@ -1,17 +1,13 @@
 /* eslint no-throw-literal: "off" */
 
 // src/utils/PicoReg.js - A register for the processor
-// PicoReg items have the following:
-//    An ID to locate the item
-//    A label
-//    A location on the screen
-//    A value
-//    A key for the RegView
+// Stores its name so it can report errors when using valueAsNumber.
+// The memory is made up of a list of registers.
 
 export default class PicoReg
 {
   #label: string;
-  #value = '';
+  #value = '?';
 
 	constructor(label: string)
 	{
