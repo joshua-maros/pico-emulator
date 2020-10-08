@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Proc from './containers/Proc';
+import Root from './html_components/Root';
 import * as serviceWorker from './serviceWorker';
+import Pico from './utils/PicoV3';
 
-ReactDOM.render(<Proc />, document.getElementById('root'));
+let pico = new Pico();
+ReactDOM.render(<Root pico={pico} />, document.getElementById('root'));
 
 serviceWorker.register();

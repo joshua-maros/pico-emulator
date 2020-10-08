@@ -1,3 +1,5 @@
+/* eslint no-throw-literal: "off" */
+
 // src/utils/PicoReg.js - A register for the processor
 // PicoReg items have the following:
 //    An ID to locate the item

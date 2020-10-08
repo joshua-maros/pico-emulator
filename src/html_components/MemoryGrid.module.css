@@ -1,0 +1,11 @@
+.root {
+  display: grid;
+  grid-template-columns: 2em 1fr 1fr 1fr 1fr;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+
+.label {
+  text-align: right;
+  padding: 0.2em;
+}

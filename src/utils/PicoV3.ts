@@ -1,9 +1,9 @@
+/* eslint no-throw-literal: "off" */
+
 import Flag from './PicoFlag';
 import Memory from './PicoMemory';
 import Processor from './Processor';
 import Reg from './PicoReg';
-
-const ERR = -4096;
 
 function isNumeric(value: string): boolean
 {
@@ -22,6 +22,10 @@ export default class Pico extends Processor
   #carryFlag = new Flag('CARRY');
   #zeroFlag = new Flag('ZERO');
   #negFlag = new Flag('NEG');
+
+  get memory(): Memory {
+    return this.#memory;
+  }
 
   ////////////////////////////////////////////////////////////////////////
   // Helper functions
@@ -102,7 +106,7 @@ export default class Pico extends Processor
       result -= 4096;
     }
     this.#accumulator.value = '' + result;
-    this.#zeroFlag.value = result == 0;
+    this.#zeroFlag.value = result === 0;
   }
 
   // Do the logic of a TAD-type instructions
