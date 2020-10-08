@@ -23,4 +23,18 @@ export default class PicoReg
   get value(): string {
     return this.#value;
   }
+
+  set valueAsNumber(value: number) {
+    this.#value = '' + value;
+  }
+
+  // Throws an exception if this register is not holding a number.
+  get valueAsNumber(): number {
+    let value = parseInt(this.#value);
+    if (isNaN(value)) {
+      throw this.#label + ' contains "' + this.#value + '", which is not a number.';
+    } else {
+      return value;
+    }
+  }
 };

@@ -26,18 +26,15 @@ export default class Processor
   #curOpcode: string | null = null;
   #curCycle: string | null = null;
 
-  // A message describing the most recent error the processor encountered.
-  #lastError: string | null = null;
+  // A message describing either the most recent operation the processor 
+  // completed or  error the processor encountered.
+  #lastMessage: string | null = null;
+  // True if the last message describes an error rather than a success.
+  #lastMessageWasError = false;
 
-  get lastError(): string | null
-  {
-    return this.#lastError;
-  }
-
-  set lastError(error: string | null)
-  {
-    this.#lastError = error;
-    this.#onChange();
+  setMessage(message: string, isError: boolean) {
+    this.#lastMessage = message;
+    this.#lastMessageWasError = isError;
   }
 
   // Clear all of the items in the processor:

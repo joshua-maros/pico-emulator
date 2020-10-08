@@ -6,7 +6,6 @@
 //    A location on the screen
 //    A length
 //    An array of values
-import RemoveQuotes from './RemoveQuotes';
 
 export default class PicoMemory
 {
@@ -19,7 +18,7 @@ export default class PicoMemory
 	/*
 	 * Set the value of the register
 	 */
-	set_value(idx: number, val: string)
+	setValue(idx: number, val: string)
 	{
 		this.#data[idx] = val;
 	};
@@ -27,7 +26,7 @@ export default class PicoMemory
   /*
    * Return the value of the register
    */
-  get_value(idx: number): string
+  getValue(idx: number): string
   {
     return this.#data[idx];
   }
