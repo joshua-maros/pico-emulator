@@ -175,15 +175,15 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             <div style={{ height: '1em' }} />
 
             <div />
-            <button onClick={() => pico.step()}>Step</button>
+            <button className="flat-button" onClick={() => pico.step()}>Step</button>
             <div />
-            <button onClick={() => pico.startRunning(false)}>Run</button>
+            <button className="flat-button" onClick={() => pico.startRunning(false)}>Run</button>
             <div />
-            <button onClick={() => pico.startRunning(true)}>Run Fast</button>
+            <button className="flat-button" onClick={() => pico.startRunning(true)}>Run Fast</button>
             <div />
-            <button onClick={() => pico.halt()}>Stop</button>
+            <button className="flat-button" onClick={() => pico.halt()}>Stop</button>
             <div />
-            <button onClick={() => pico.reset()}>Reset</button>
+            <button className="flat-button" onClick={() => pico.reset()}>Reset</button>
 
             <div />
             <div style={{ height: '1em' }} />
@@ -209,15 +209,17 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
         </div>
         <div className={style.actions}>
           <button
+            className="flat-button"
             onClick={() => { pico.memory.shiftUp(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
             disabled={!editingMemoryCell}
           >Shift Up</button>
           <button
+            className="flat-button"
             onClick={() => { pico.memory.shiftDown(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
             disabled={!editingMemoryCell}
           >Shift Down</button>
-          <button onClick={saveFile}>Save Memory</button>
-          <label htmlFor="file">Load Memory</label>
+          <button className="flat-button" onClick={saveFile}>Save Memory</button>
+          <label className="flat-button" htmlFor="file">Load Memory</label>
           <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />
         </div>
       </div>
