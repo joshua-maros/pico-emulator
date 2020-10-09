@@ -172,25 +172,30 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             <FlagCell flag={pico.negFlag} />
 
             <div />
-            <div style={{ height: '1em' }} />
+            <div style={{ height: '2em' }} />
+
+            <div className={style.label}>Selected:</div>
+            <div>{editingLabel}</div>
+            <div className={style.label}>Value:</div>
+            <input
+              ref={this.textBoxRef}
+              value={this.state.editing.register.value}
+              onChange={changeValue}
+              onKeyUp={inputKeyUp}
+            />
 
             <div />
-            <button className="flat-button" onClick={() => pico.step()}>Step</button>
+            <button
+              className="flat-button"
+              onClick={() => { pico.memory.shiftUp(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+              disabled={!editingMemoryCell}
+            >Shift Up</button>
             <div />
-            <button className="flat-button" onClick={() => pico.startRunning(false)}>Run</button>
-            <div />
-            <button className="flat-button" onClick={() => pico.startRunning(true)}>Run Fast</button>
-            <div />
-            <button className="flat-button" onClick={() => pico.halt()}>Stop</button>
-            <div />
-            <button className="flat-button" onClick={() => pico.reset()}>Reset</button>
-
-            <div />
-            <div style={{ height: '1em' }} />
-            <div />
-            <div className={pico.lastMessageWasError ? style.error_message : style.info_message}>
-              {pico.lastMessage}
-            </div>
+            <button
+              className="flat-button"
+              onClick={() => { pico.memory.shiftDown(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+              disabled={!editingMemoryCell}
+            >Shift Down</button>
           </div>
           <MemoryGrid
             memory={pico.memory}
@@ -198,29 +203,19 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             focusedIndex={this.state.editing.memoryIndex}
           />
         </div>
-        <div className={style.register_editor}>
-          <div className={style.label}>Edit {editingLabel}:</div>
-          <input
-            ref={this.textBoxRef}
-            value={this.state.editing.register.value}
-            onChange={changeValue}
-            onKeyUp={inputKeyUp}
-          />
+        <div className={pico.lastMessageWasError ? style.error_message : style.info_message}>
+          {pico.lastMessage}
         </div>
         <div className={style.actions}>
-          <button
-            className="flat-button"
-            onClick={() => { pico.memory.shiftUp(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
-            disabled={!editingMemoryCell}
-          >Shift Up</button>
-          <button
-            className="flat-button"
-            onClick={() => { pico.memory.shiftDown(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
-            disabled={!editingMemoryCell}
-          >Shift Down</button>
+          <button className="flat-button" onClick={() => pico.step()}>Step</button>
+          <button className="flat-button" onClick={() => pico.startRunning(false)}>Run</button>
+          <button className="flat-button" onClick={() => pico.startRunning(true)}>Run Fast</button>
+          <button className="flat-button" onClick={() => pico.halt()}>Stop</button>
+          <button className="flat-button" onClick={() => pico.reset()}>Reset</button>
           <button className="flat-button" onClick={saveFile}>Save Memory</button>
           <label className="flat-button" htmlFor="file">Load Memory</label>
           <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />
+          <button className={'flat-button ' + style.switch_view_button}>Switch To Datapath View</button>
         </div>
       </div>
     )

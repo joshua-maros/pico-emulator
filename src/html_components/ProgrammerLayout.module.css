@@ -15,9 +15,11 @@
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-column-gap: 0.5em;
   column-gap: 0.5em;
+  grid-row-gap: 0.5em;
+  row-gap: 0.5em;
 }
 
 .actions button {
@@ -59,15 +61,18 @@
 }
 
 .info_message {
-  margin: -0.5em;
   padding: 0.5em;
   color: var(--info-text);
   background: var(--info-text-bg);
 }
 
 .error_message {
-  margin: -0.5em;
   padding: 0.5em;
   color: var(--error-text);
   background: var(--error-text-bg);
+}
+
+.switch_view_button {
+  grid-column: 4;
+  grid-column-end: 6;
 }
