@@ -1,10 +1,29 @@
 .root {
-  background: var(--neutral-bg);
   text-align: right;
   padding: var(--cell-padding);
   border: var(--cell-border-weight) solid black;
 }
 
-.focused {
-  background: var(--selected-bg);
+.root.focused {
+  border-left: 0.5em solid var(--selected);
+}
+
+.use_read {
+  background: var(--read-bg);
+}
+
+.use_write {
+  background: var(--write-bg);
+}
+
+.use_instruction {
+  background: var(--instruction-bg);
+}
+
+.use_jump_target {
+  background: var(--jump-target-bg);
+}
+
+.use_error {
+  background: var(--error-bg);
 }

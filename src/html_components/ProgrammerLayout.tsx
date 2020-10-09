@@ -84,10 +84,11 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
 
     const changeValue = (event: React.ChangeEvent<HTMLInputElement>) =>
     {
+      let value = event.target.value.toUpperCase();
       this.setState(
         state =>
         {
-          state.editing.register.value = event.target.value.toUpperCase();
+          state.editing.register.value = value;
           return state;
         }
       );

@@ -32,4 +32,12 @@ export default class PicoMemory
       byte.value = '?';
     }
   }
+
+  clearLastUse()
+  {
+    for (let cell of this.#data)
+    {
+      cell.clearLastUse();
+    }
+  }
 };

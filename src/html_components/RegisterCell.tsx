@@ -14,11 +14,12 @@ export default class RegisterCell extends React.Component<Props> {
   render()
   {
     return (
-      <div 
-        onClick={_e => this.props.onClick()} 
+      <div
+        onClick={_e => this.props.onClick()}
         className={
           style.root
           + (this.props.focused ? ' ' + style.focused : '')
+          + ' ' + style['use_' + this.props.reg.lastUse]
         }
       >
         {this.props.reg.value}

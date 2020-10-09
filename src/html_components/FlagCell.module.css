@@ -1,5 +1,4 @@
 .root {
-  background: #eee;
   text-align: center;
   padding: var(--cell-padding);
   border: var(--cell-border-weight) solid black;
