@@ -208,8 +208,14 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
           />
         </div>
         <div className={style.actions}>
-          <button disabled={!editingMemoryCell}>Shift Up</button>
-          <button disabled={!editingMemoryCell}>Shift Down</button>
+          <button
+            onClick={() => { pico.memory.shiftUp(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+            disabled={!editingMemoryCell}
+          >Shift Up</button>
+          <button
+            onClick={() => { pico.memory.shiftDown(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+            disabled={!editingMemoryCell}
+          >Shift Down</button>
           <button onClick={saveFile}>Save Memory</button>
           <label htmlFor="file">Load Memory</label>
           <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />

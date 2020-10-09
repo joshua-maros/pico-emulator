@@ -40,4 +40,18 @@ export default class PicoMemory
       cell.clearLastUse();
     }
   }
+
+  shiftDown(at: number) {
+    for (let targetIndex = this.#data.length - 1; targetIndex > at; targetIndex--) {
+      this.#data[targetIndex].value = this.#data[targetIndex - 1].value;
+    }
+    this.#data[at].value = '?'
+  }
+
+  shiftUp(at: number) {
+    for (let targetIndex = at; targetIndex < this.#data.length - 1; targetIndex++) {
+      this.#data[targetIndex].value = this.#data[targetIndex + 1].value;
+    }
+    this.#data[this.#data.length - 1].value = '?'
+  }
 };
