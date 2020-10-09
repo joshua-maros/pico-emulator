@@ -199,6 +199,7 @@ export default abstract class Processor
     catch (error)
     {
       this.setMessage(error, true);
+      this.halt();
     }
     this.#onChange();
   }

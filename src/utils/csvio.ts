@@ -49,6 +49,10 @@ function loadMem(mem: PicoMemory, file: string): string | null
   let currentIndex = 0;
   let state = READING_NUMBER;
 
+  // This just makes the file easier to parse if we can assume that there is a
+  // newline after every entry.
+  file += '\n';
+
   for (let char of file)
   {
     // Pretend that LF is the only newline character.
