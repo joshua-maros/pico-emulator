@@ -44,7 +44,13 @@ export default class Pico extends Processor
 
   protected doReset()
   {
+    this.#accumulator.value = '?';
     this.#programCounter.valueAsNumber = 0;
+    this.#instructionRegister.value = '?';
+    this.#qReg.value = '?';
+    this.#carryFlag.value = false;
+    this.#zeroFlag.value = false;
+    this.#negFlag.value = false;
     this.clearLastUse();
   }
 
