@@ -8,6 +8,7 @@ import style from './ProgrammerLayout.module.css';
 import RegisterCell from './RegisterCell';
 import FlagCell from './FlagCell';
 import PicoReg from '../utils/PicoReg';
+import csvio from '../utils/csvio';
 
 type Props = {
   pico: Pico
@@ -83,8 +84,13 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
 
     const changeValue = (event: React.ChangeEvent<HTMLInputElement>) =>
     {
-      this.state.editing.register.value = event.target.value.toUpperCase();
-      this.forceUpdate();
+      this.setState(
+        state =>
+        {
+          state.editing.register.value = event.target.value.toUpperCase();
+          return state;
+        }
+      );
     };
 
     // Moves to the next memory cell if possible.
@@ -114,6 +120,34 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       {
         advanceEditor();
       }
+    }
+
+    const loadFile = (event: React.ChangeEvent<HTMLInputElement>) =>
+    {
+      let file = event.target.files?.item(0);
+      if (!file) return;
+      file.text().then((text: string) =>
+      {
+        let error = csvio.loadMem(pico.memory, text);
+        this.forceUpdate();
+        if (error)
+        {
+          alert('Error encountered while loading file:\n' + error);
+        }
+      });
+    };
+
+    const saveFile = () => 
+    {
+      let contents = csvio.saveMem(pico.memory);
+      let blob = new Blob([contents]);
+      let href = URL.createObjectURL(blob);
+      let link = document.createElement('a');
+      link.download = 'Memory.csv';
+      link.type = 'text/csv';
+      link.href = href;
+      link.click();
+      link.remove();
     }
 
     return (
@@ -172,9 +206,12 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             onKeyUp={inputKeyUp}
           />
         </div>
-        <div className={style.register_editor}>
+        <div className={style.actions}>
           <button disabled={!editingMemoryCell}>Shift Up</button>
           <button disabled={!editingMemoryCell}>Shift Down</button>
+          <button onClick={saveFile}>Save Memory</button>
+          <label htmlFor="file">Load Memory</label>
+          <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />
         </div>
       </div>
     )

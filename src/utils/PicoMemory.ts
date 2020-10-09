@@ -17,9 +17,19 @@ export default class PicoMemory
 
   get(idx: number): PicoReg
   {
-    if (idx >= this.#data.length) {
+    if (idx >= this.#data.length)
+    {
       throw `${idx} is not a valid memory address`;
     }
     return this.#data[idx];
+  }
+
+  // Sets all bytes in memory to ?
+  clear()
+  {
+    for (let byte of this.#data)
+    {
+      byte.value = '?';
+    }
   }
 };
