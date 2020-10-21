@@ -1,4 +1,5 @@
 import { Bus } from "./connections";
+import { Datapath } from "./Datapath";
 
 export class Input
 {
@@ -170,6 +171,6 @@ export abstract class LogicComponent
   }
 
   // Returns an SVG element that represents this component visually.
-  public abstract render(): JSX.Element
+  public abstract render(key: string, d: Datapath): JSX.Element
 }
 

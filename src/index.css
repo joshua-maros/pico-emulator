@@ -51,10 +51,35 @@ code {
     position: relative;
 }
 
+/* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
+.datapath {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 .datapath .component {
   fill: #fff;
   stroke: black;
   stroke-width: 1px;
+}
+
+.datapath .label {
+  fill: #000;
+  stroke: none;
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+.datapath .active {
+  fill: #44ee44;
+}
+.datapath .inactive {
+  fill: #cceecc;
 }
 
 .intersection {

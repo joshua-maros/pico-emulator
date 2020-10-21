@@ -1,5 +1,6 @@
 import React from 'react';
 import { Input, LogicComponent, Output } from "./component";
+import { Datapath } from './Datapath';
 
 export class And extends LogicComponent
 {
@@ -26,18 +27,18 @@ export class And extends LogicComponent
     }
   }
 
-  public render()
+  public render(k: string, d: Datapath)
   {
-    return (<AndView c={this}/>)
+    return (<AndView key={k} c={this} d={d} />)
   }
 }
 
-class AndView extends React.Component<{ c: And }>
+class AndView extends React.Component<{ c: And, d: Datapath }>
 {
   render()
   {
     const { x, y } = this.props.c;
-    const xfrm = 'translate(' + x + ',' + y + ')';
+    const xfrm = `translate(${x}, ${y})`;
     return (
       <g transform={xfrm} className="component">
         <path d='M0 0 H10 A10 10 0 0 1 10 20 H 0 Z' />
