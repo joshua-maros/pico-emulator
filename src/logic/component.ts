@@ -1,88 +1,167 @@
-import { Bus, BusInput, BusOutput } from "./connections";
+import { Bus } from "./connections";
 
-export interface ConnectionPrototype
+export class Input
 {
-  name: string;
-  x: number;
-  y: number;
-}
+  // This should return the value of what the input is connected to when called. Return undefined
+  // if there is no valid value being fed into this input. When an input is created this function 
+  // will always return undefined until replaced by an actual connection.
+  #connection: () => string | undefined = () => undefined;
 
-export class ConnectedInput
-{
   constructor(
     public name: string,
     public x: number,
     public y: number,
-    public connection: BusOutput
   ) { }
-}
 
-export class ConnectedOutput
-{
-  constructor(
-    public name: string,
-    public x: number,
-    public y: number,
-    public connection: BusInput
-  ) { }
-}
-
-export class Component
-{
-  protected inputs: Map<string, ConnectedInput>;
-  protected outputs: Map<string, ConnectedOutput>;
-
-  protected constructor(
-    inputs: Array<ConnectionPrototype>,
-    outputs: Array<ConnectionPrototype>,
-    inputConnections: Map<string, Bus>,
-    outputConnections: Map<string, Bus>)
+  // Set the connection of this input by providing a function which, when called, returns the value
+  // that is being fed into this input.
+  set connection(connection: () => string | undefined)
   {
-    this.inputs = new Map();
-    this.outputs = new Map();
+    this.#connection = connection;
+  }
 
-    // Check for extra inputs.
-    for (let name of inputConnections.keys())
+  // Returns the value being fed into this input. Returns undefined i this input is not being fed
+  // a value.
+  get value(): string | undefined
+  {
+    return this.#connection();
+  }
+
+  // Returns the value being fed into this input as a boolean. Throws an error if this input is 
+  // being fed a value that is not a boolean. Returns undefined if this input is not being fed a
+  // value.
+  get asBoolean(): boolean | undefined
+  {
+    let value = this.value;
+    if (typeof value === 'string')
     {
-      if (!inputs.some(i => i.name === name))
+      if (value === '0' || value === 'false')
       {
-        throw new Error('Component does not have an input named ' + name);
+        return false;
+      }
+      else if (value === '1' || value === 'true')
+      {
+        return true;
+      }
+      throw new Error('Emulator error: ' + value + ' is not a valid boolean.');
+    }
+    return undefined;
+  }
+
+  // Returns the value being fed into this input as an integer. Throws an error if this input is 
+  // being fed a value that is not an integer. Returns undefined if this input is not being fed a
+  // value.
+  get asInteger(): number | undefined
+  {
+    let value = this.value;
+    if (typeof value === 'string')
+    {
+      try
+      {
+        return parseInt(value);
+      }
+      catch
+      {
+        throw new Error('Emulator error: ' + value + ' is not a valid boolean.');
       }
     }
-    // Connect the inputs.
-    for (let input of inputs)
-    {
-      let bus = inputConnections.get(input.name);
-      if (bus === undefined)
-        throw new Error('Component is missing an input named ' + name);
-      // The output of the bus connects to the input of the component.
-      let connection = bus.createOutput();
-      this.inputs.set(name, {
-        ...input,
-        connection,
-      });
-    }
+    return undefined;
+  }
+}
 
-    // Check for extra outputs.
-    for (let name of outputConnections.keys())
+export class Output
+{
+  // The value that is being outputted. Undefined if we are not outputting anything.
+  #value: string | undefined = undefined;
+
+  constructor(
+    public name: string,
+    public x: number,
+    public y: number,
+  ) { }
+
+  // Returns the value this output is currently outputting, undefined if nothing is being outputted.
+  get value(): string | undefined
+  {
+    return this.#value;
+  }
+
+  // Sets the value of this output. Use undefined to clear the output.
+  set value(value: string | undefined)
+  {
+    this.#value = value;
+  }
+
+  // Sets the value of this output as if it were a boolean. Use undefined to clear the output.
+  set asBoolean(value: boolean | undefined)
+  {
+    if (typeof value === 'boolean')
     {
-      if (!outputs.some(i => i.name === name))
-      {
-        throw new Error('Component does not have an output named ' + name);
-      }
+      // This way it also works as a number.
+      this.value = value ? '1' : '0';
     }
-    // Connect the outputs.
-    for (let output of outputs)
+    else
     {
-      let bus = outputConnections.get(output.name);
-      if (bus === undefined)
-        throw new Error('Component is missng an output named ' + name);
-      // The output of the component connects to the input of the bus.
-      let connection = bus.createInput();
-      this.outputs.set(name, {
-        ...output,
-        connection,
-      });
+      this.value = undefined;
+    }
+  }
+
+  // Sets the value of this output as if it were an integer. Use undefined to clear the output.
+  set asInteger(value: number | undefined)
+  {
+    if (typeof value === 'number')
+    {
+      this.value = value.toFixed(0);
+    }
+    else
+    {
+      this.value = undefined;
+    }
+  }
+
+  // Clears this output, equivalent to this.value = undefined;
+  public clear()
+  {
+    this.value = undefined;
+  }
+}
+
+export class LogicComponent
+{
+  // Type is used for error messages, e.g. [type] has no input named [bad name].
+  constructor(private type: string) { }
+
+  // Evaluates this logic component, updating its outputs accordingly. This is
+  // done when inputs change in between clock cycles.
+  public eval() { }
+
+  // Connects the input with the given name to the provided bus, if it exists.
+  // An error is thrown if it does not exist.
+  public connectInput(name: string, bus: Bus)
+  {
+    let maybeInput = (this as any)[name];
+    if (maybeInput instanceof Input)
+    {
+      bus.connectInput(maybeInput);
+    }
+    else
+    {
+      throw new Error(`Emulator error: ${this.type} has no input named ${name}.`);
+    }
+  }
+
+  // Connects the output with the given name to the provided bus, if it exists.
+  // An error is thrown if it does not exist.
+  public connectOutput(name: string, bus: Bus)
+  {
+    let maybeOutput = (this as any)[name];
+    if (maybeOutput instanceof Output)
+    {
+      bus.connectOutput(maybeOutput);
+    }
+    else
+    {
+      throw new Error(`Emulator error: ${this.type} has no output named ${name}.`);
     }
   }
 }

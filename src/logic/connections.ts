@@ -1,3 +1,5 @@
+import { Input, Output } from "./component";
+
 export enum BusException
 {
   Inactive,
@@ -6,91 +8,66 @@ export enum BusException
 
 export class Bus
 {
-  public static Input = class
-  {
-    // Either a value or inactive.
-    #value: string | BusException.Inactive = '';
-    constructor(private bus: Bus) { }
-
-    get active()
-    {
-      return this.#value !== BusException.Inactive;
-    }
-
-    get value()
-    {
-      return this.#value;
-    }
-
-    // Updates the input with the new value. Updates the bus this input is
-    // attached to. Put in a null value to make the input inactive.
-    setValue(value: string | BusException.Inactive)
-    {
-      let shouldBeActive = value !== BusException.Inactive;
-      if (shouldBeActive && !this.active)
-      {
-        this.bus.#activeInputs.push(this);
-      } else if (!shouldBeActive && this.active)
-      {
-        let thisIndex = this.bus.#activeInputs.indexOf(this);
-        this.bus.#activeInputs.splice(thisIndex, 1);
-      }
-      this.#value = value;
-    }
-
-    // Equivalent to setValue(BusException.Inactive)
-    clearValue()
-    {
-      this.setValue(BusException.Inactive);
-    }
-  };
-
-  public static Output = class
-  {
-    constructor(private bus: Bus) { }
-
-
-    get value()
-    {
-      return this.bus.value;
-    }
-  };
-
-  // Stores the inputs which are currently active.
-  #activeInputs: Array<BusInput> = [];
-
-  createInput(): BusInput
-  {
-    return new BusInput(this);
-  }
-
-  createOutput(): BusOutput
-  {
-    return new BusOutput(this);
-  }
+  // The inputs to the bus are the outputs of components.
+  #inputs: Array<Output> = [];
 
   // Returns the current value of this bus as a string if valid, or a variant of
   // BusException otherwise.
-  get value(): string | BusException.Inactive | BusException.Conflict
+  get displayValue(): string | BusException.Inactive | BusException.Conflict
   {
-    if (this.#activeInputs.length === 0)
+    let activeInputs = 0;
+    let value: string | BusException.Inactive = BusException.Inactive;
+    for (let input of this.#inputs)
     {
-      return BusException.Inactive;
+      if (input.value !== undefined) 
+      {
+        if (activeInputs === 0)
+        {
+          value = input.value;
+        }
+        else
+        {
+          // This would now be the second active input we've found.
+          return BusException.Conflict;
+        }
+      }
     }
-    else if (this.#activeInputs.length > 1)
+    return value;
+  }
+
+  // Like getDisplayValue but uses undefined if there is a problem. This is used
+  // because it is easier to implement eval() functions this way.
+  get value(): string | undefined 
+  {
+    let activeInputs = 0;
+    let value: string | undefined = undefined;
+    for (let input of this.#inputs)
     {
-      return BusException.Conflict;
+      if (input.value !== undefined) 
+      {
+        if (activeInputs === 0)
+        {
+          value = input.value;
+        }
+        else
+        {
+          // This would now be the second active input we've found.
+          return undefined;
+        }
+      }
     }
-    return this.#activeInputs[0].value;
+    return value;
+  }
+
+  // Connects a component's input such that its value is provided by this bus.
+  public connectInput(input: Input)
+  {
+    input.connection = () => this.value;
+  }
+
+  // Connects a component's output such that its value is fed into this bus.
+  public connectOutput(output: Output)
+  {
+    this.#inputs.push(output);
   }
 }
-
-// Why does this work? Why is it necessary? For centuries, philosophers have
-// struggled with these great questions...
-export const BusInput = Bus.Input;
-let bus = new Bus();
-let input = new Bus.Input(bus);
-export type BusInput = typeof input;
-export const BusOutput = Bus.Output;
-let output = new Bus.Output(bus);
-export type BusOutput = typeof output;
