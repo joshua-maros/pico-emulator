@@ -12,9 +12,10 @@ export class Bus
   #inputs: Array<Output> = [];
 
   // Stores the pins that are connected to this bus, used for building a wire
-  // which visually represents this bus.
-  public connectedInputPins: Array<[LogicComponent, Input]> = [];
-  public connectedOutputPins: Array<[LogicComponent, Output]> = [];
+  // which visually represents this bus. Unfortunately we cannot use [tuple, notation]
+  // because that causes ts to freak out.
+  public connectedInputPins: Array<{ c: LogicComponent, p: Input }> = [];
+  public connectedOutputPins: Array<{ c: LogicComponent, p: Output }> = [];
 
   // Returns the current value of this bus as a string if valid, or a variant of
   // BusException otherwise.
@@ -68,13 +69,13 @@ export class Bus
   public connectInput(c: LogicComponent, input: Input)
   {
     input.connection = () => this.value;
-    this.connectedInputPins.push([c, input]);
+    this.connectedInputPins.push({ c, p: input });
   }
 
   // Connects a component's output such that its value is fed into this bus.
   public connectOutput(c: LogicComponent, output: Output)
   {
     this.#inputs.push(output);
-    this.connectedOutputPins.push([c, output]);
+    this.connectedOutputPins.push({ c, p: output });
   }
 }

@@ -40,8 +40,8 @@ class SegmentsBuilder
   {
     const result = this.bus.connectedInputPins[index];
     return {
-      x: result[0].x + result[1].x,
-      y: result[0].x + result[1].x
+      x: result.c.x + result.p.x,
+      y: result.c.x + result.p.x
     };
   }
 
@@ -49,8 +49,8 @@ class SegmentsBuilder
   {
     const result = this.bus.connectedOutputPins[index];
     return {
-      x: result[0].x + result[1].x,
-      y: result[0].x + result[1].x
+      x: result.c.x + result.p.x,
+      y: result.c.x + result.p.x
     };
   }
 
