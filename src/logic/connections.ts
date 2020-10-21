@@ -1,4 +1,4 @@
-import { Input, Output } from "./component";
+import { Input, LogicComponent, Output } from "./component";
 
 export enum BusException
 {
@@ -10,6 +10,11 @@ export class Bus
 {
   // The inputs to the bus are the outputs of components.
   #inputs: Array<Output> = [];
+
+  // Stores the pins that are connected to this bus, used for building a wire
+  // which visually represents this bus.
+  public connectedInputPins: Array<[LogicComponent, Input]> = [];
+  public connectedOutputPins: Array<[LogicComponent, Output]> = [];
 
   // Returns the current value of this bus as a string if valid, or a variant of
   // BusException otherwise.
@@ -60,14 +65,16 @@ export class Bus
   }
 
   // Connects a component's input such that its value is provided by this bus.
-  public connectInput(input: Input)
+  public connectInput(c: LogicComponent, input: Input)
   {
     input.connection = () => this.value;
+    this.connectedInputPins.push([c, input]);
   }
 
   // Connects a component's output such that its value is fed into this bus.
-  public connectOutput(output: Output)
+  public connectOutput(c: LogicComponent, output: Output)
   {
     this.#inputs.push(output);
+    this.connectedOutputPins.push([c, output]);
   }
 }

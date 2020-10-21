@@ -147,7 +147,7 @@ export abstract class LogicComponent
     let maybeInput = (this as any)[name];
     if (maybeInput instanceof Input)
     {
-      bus.connectInput(maybeInput);
+      bus.connectInput(this, maybeInput);
     }
     else
     {
@@ -162,7 +162,7 @@ export abstract class LogicComponent
     let maybeOutput = (this as any)[name];
     if (maybeOutput instanceof Output)
     {
-      bus.connectOutput(maybeOutput);
+      bus.connectOutput(this, maybeOutput);
     }
     else
     {
