@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input, LogicComponent, Output } from "./component";
 import { Bus, BusException } from './connections';
-import { Datapath } from './Datapath';
+import { Datapath } from './datapath';
 
 export class Wire
 {

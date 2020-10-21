@@ -1,5 +1,5 @@
 import { Bus } from "./connections";
-import { Datapath } from "./Datapath";
+import { Datapath } from "./datapath";
 
 export class Input
 {

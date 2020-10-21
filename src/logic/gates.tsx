@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input, LogicComponent, Output } from "./component";
-import { Datapath } from './Datapath';
+import { Datapath } from './datapath';
 
 export class And extends LogicComponent
 {
@@ -9,7 +9,7 @@ export class And extends LogicComponent
   public in1 = new Input('in1', 0, 15);
   public out = new Output('out', 20, 10);
 
-  constructor(id: string, x: number, y: number)
+  constructor(id: string, x: number, y: number, _params: any)
   {
     super("And", id, x, y);
   }

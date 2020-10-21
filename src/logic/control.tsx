@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input, LogicComponent, Output } from "./component";
-import { Datapath } from './Datapath';
+import { Datapath } from './datapath';
 
 export class Control extends LogicComponent
 {
@@ -13,17 +13,25 @@ export class Control extends LogicComponent
   readonly height: number = 20;
   // 0,1 for bool control, 0-len for option control.
   #value: number = 0;
+  public readonly name: string;
+  public readonly top: boolean;
 
   constructor(
     id: string,
     x: number,
     y: number,
-    public readonly name: string,
-    top: boolean,
-    options?: Array<string>)
+    params: any,
+    )
   {
     super("Control", id, x, y);
+
+    let top = params.top !== false;
+    this.top = top;
+    let name: string = params.name || 'Unnamed';
+    this.name = name;
+    let options = params.options;
     this.#options = options;
+
     if (this.#options !== undefined)
     {
       this.#options.splice(0, 0, 'none');
