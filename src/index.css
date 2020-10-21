@@ -82,6 +82,29 @@ code {
   fill: #cceecc;
 }
 
+.datapath .wire {
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.datapath .wire.inactive {
+  stroke-dasharray: 4px 2px;
+}
+
+.datapath .wire.active.low {
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.datapath .wire.active {
+  stroke: #5555FF;
+  stroke-width: 3px;
+}
+
+.datapath .wire.conflict {
+  stroke: #FF2222;
+}
+
 .intersection {
     width: 40px;
     height: 40px;

@@ -5,9 +5,9 @@ import { Datapath } from './Datapath';
 export class And extends LogicComponent
 {
   // The names of the fields need to match the names given to the constructor.
-  public in0 = new Input('in0', 0, 0);
-  public in1 = new Input('in1', 0, 0);
-  public out = new Output('out', 0, 0);
+  public in0 = new Input('in0', 0, 5);
+  public in1 = new Input('in1', 0, 15);
+  public out = new Output('out', 20, 10);
 
   constructor(id: string, x: number, y: number)
   {

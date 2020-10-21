@@ -1,13 +1,13 @@
 import React from 'react';
 import { Input, LogicComponent, Output } from "./component";
-import { Bus } from './connections';
+import { Bus, BusException } from './connections';
 import { Datapath } from './Datapath';
 
 export class Wire
 {
   segments: Array<WireSegment>;
 
-  constructor(private bus: Bus, pathDescription: string)
+  constructor(public readonly bus: Bus, pathDescription: string)
   {
     const builder = new SegmentsBuilder(bus);
     builder.parse(pathDescription);
@@ -41,7 +41,7 @@ class SegmentsBuilder
     const result = this.bus.connectedInputPins[index];
     return {
       x: result.c.x + result.p.x,
-      y: result.c.x + result.p.x
+      y: result.c.y + result.p.y
     };
   }
 
@@ -50,7 +50,7 @@ class SegmentsBuilder
     const result = this.bus.connectedOutputPins[index];
     return {
       x: result.c.x + result.p.x,
-      y: result.c.x + result.p.x
+      y: result.c.y + result.p.y
     };
   }
 
@@ -265,6 +265,16 @@ class WireView extends React.Component<{ c: Wire, d: Datapath }>
 {
   render()
   {
+    const busValue = this.props.c.bus.displayValue;
+    let className = 'active';
+    if (busValue === BusException.Inactive) {
+      className = 'inactive';
+    } else if (busValue === BusException.Conflict) {
+      className = 'conflict';
+    } else if (busValue === '0' || busValue === 'false') {
+      className += ' low';
+    }
+    className += ' wire';
     let segments = [], i = 0;
     for (const seg of this.props.c.segments)
     {
@@ -272,7 +282,7 @@ class WireView extends React.Component<{ c: Wire, d: Datapath }>
       i++;
     }
     return (
-      <g className="wire">
+      <g className={className}>
         {segments}
       </g>);
   }
