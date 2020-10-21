@@ -126,10 +126,14 @@ export class Output
   }
 }
 
-export class LogicComponent
+export abstract class LogicComponent
 {
   // Type is used for error messages, e.g. [type] has no input named [bad name].
-  constructor(private type: string) { }
+  constructor(
+    private type: string,
+    public id: string,
+    public x: number,
+    public y: number) { }
 
   // Evaluates this logic component, updating its outputs accordingly. This is
   // done when inputs change in between clock cycles.
@@ -164,4 +168,8 @@ export class LogicComponent
       throw new Error(`Emulator error: ${this.type} has no output named ${name}.`);
     }
   }
+
+  // Returns an SVG element that represents this component visually.
+  public abstract render(): JSX.Element
 }
+

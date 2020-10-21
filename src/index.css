@@ -51,6 +51,12 @@ code {
     position: relative;
 }
 
+.datapath .component {
+  fill: #fff;
+  stroke: black;
+  stroke-width: 1px;
+}
+
 .intersection {
     width: 40px;
     height: 40px;
