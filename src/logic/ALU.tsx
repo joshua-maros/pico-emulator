@@ -1,24 +1,7 @@
 import React from 'react';
+import { asUnsignedBits, fromSignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
-
-// Clips the provided number to be the indicated number of bits.
-function asUnsignedBits(value: number, nbits: number): number
-{
-  return value & ((1 << nbits) - 1);
-}
-
-// Clips the provided number to be the indicated number of bits.
-function fromSignedBits(value: number, nbits: number): number
-{
-  let bits = asUnsignedBits(value, nbits);
-  const maxval = 1 << (nbits - 1);
-  if (bits >= maxval)
-  {
-    bits -= maxval;
-  }
-  return bits;
-}
 
 export class ALU extends LogicComponent
 {
@@ -34,7 +17,7 @@ export class ALU extends LogicComponent
   constructor(id: string, x: number, y: number, params: any)
   {
     super("ALU", id, x, y);
-    this.nBits = params;
+    this.nBits = params.nbits;
   }
 
   // We have performed the math on in0 and in1 to make result, but as

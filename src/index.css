@@ -75,6 +75,13 @@ code {
   font-size: 16px;
 }
 
+.datapath .value {
+  fill: #22F;
+  stroke: none;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
 .datapath .active {
   fill: #44ee44;
 }

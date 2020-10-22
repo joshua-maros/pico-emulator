@@ -1,8 +1,10 @@
 import React from 'react';
+import { ALU } from './ALU';
 import { LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
 import { And, Or } from './gates';
+import { Incrementer } from './Incrementer';
 import { Tristate } from './Tristate';
 import { Wire } from './Wire';
 
@@ -23,8 +25,10 @@ export interface DatapathDef
 
 type ComponentMaker = (id: string, x: number, y: number, params: Map<string, any>) => LogicComponent;
 const componentTypes: Map<string, ComponentMaker> = new Map([
+  ["ALU", (i, x, y, p): LogicComponent => new ALU(i, x, y, p)],
   ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
   ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
+  ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
   ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
   ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
 ]);

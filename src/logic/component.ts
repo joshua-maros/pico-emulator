@@ -87,6 +87,16 @@ export class Output
     return this.#value;
   }
 
+  get asUserText(): string
+  {
+    let value = this.value;
+    if (value === undefined)
+    {
+      return '?';
+    }
+    return value;
+  }
+
   // Sets the value of this output. Use undefined to clear the output.
   set value(value: string | undefined)
   {
@@ -139,6 +149,11 @@ export abstract class LogicComponent
   // Evaluates this logic component, updating its outputs accordingly. This is
   // done when inputs change in between clock cycles.
   public eval() { }
+
+  // Called when a cycle ends. Eval() will always be called one or more times
+  // before this is called. Example usage of this is in latches, where the
+  // value is only stored at the end of the clock cycle.
+  public evalClock() { }
 
   // Connects the input with the given name to the provided bus, if it exists.
   // An error is thrown if it does not exist.
