@@ -2,7 +2,8 @@ import React from 'react';
 import { LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
-import { And } from './gates';
+import { And, Or } from './gates';
+import { Tristate } from './Tristate';
 import { Wire } from './Wire';
 
 export interface DatapathDef
@@ -24,6 +25,8 @@ type ComponentMaker = (id: string, x: number, y: number, params: Map<string, any
 const componentTypes: Map<string, ComponentMaker> = new Map([
   ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
   ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
+  ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
+  ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
 ]);
 
 export class Datapath
@@ -142,7 +145,7 @@ export class DatapathView extends React.Component<{ datapath: Datapath }>
       key += 1;
     }
 
-    return (<svg className="datapath">
+    return (<svg className="datapath" width={1000}>
       {children}
     </svg>);
   }

@@ -103,6 +103,7 @@ code {
 
 .datapath .wire.conflict {
   stroke: #FF2222;
+  stroke-width: 3px;
 }
 
 .intersection {

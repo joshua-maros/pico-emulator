@@ -30,6 +30,7 @@ export class Bus
         if (activeInputs === 0)
         {
           value = input.value;
+          activeInputs = 1;
         }
         else
         {
