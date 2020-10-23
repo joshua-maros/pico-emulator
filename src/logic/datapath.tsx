@@ -3,6 +3,7 @@ import { ALU } from './ALU';
 import { LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
+import { Expand } from './Expand';
 import { And, Or } from './gates';
 import { Incrementer } from './Incrementer';
 import { Latch } from './Latch';
@@ -29,6 +30,7 @@ const componentTypes: Map<string, ComponentMaker> = new Map([
   ["ALU", (i, x, y, p): LogicComponent => new ALU(i, x, y, p)],
   ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
   ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
+  ["Expand", (i, x, y, p): LogicComponent => new Expand(i, x, y, p)],
   ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
   ["Latch", (i, x, y, p): LogicComponent => new Latch(i, x, y, p)],
   ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
