@@ -7,9 +7,10 @@ export class Wire
 {
   segments: Array<WireSegment>;
 
-  constructor(public readonly bus: Bus, pathDescription: string)
+  // Ins and outs arrays are for debugging only.
+  constructor(public readonly bus: Bus, pathDescription: string, ins: Array<string>, outs: Array<string>)
   {
-    const builder = new SegmentsBuilder(bus);
+    const builder = new SegmentsBuilder(bus, ins, outs);
     builder.parse(pathDescription);
     this.segments = builder.segments;
   }
@@ -34,11 +35,11 @@ class SegmentsBuilder
 {
   segments: Array<WireSegment> = [];
 
-  constructor(private bus: Bus) { }
+  constructor(private bus: Bus, private ins: Array<string>, private outs: Array<string>) { }
 
   private getInputPin(index: number): { x: number, y: number }
   {
-    const result = this.bus.connectedInputPins[index];
+    const result = this.bus.connectedOutputPins[index];
     return {
       x: result.c.x + result.p.x,
       y: result.c.y + result.p.y
@@ -47,7 +48,7 @@ class SegmentsBuilder
 
   private getOutputPin(index: number): { x: number, y: number }
   {
-    const result = this.bus.connectedOutputPins[index];
+    const result = this.bus.connectedInputPins[index];
     return {
       x: result.c.x + result.p.x,
       y: result.c.y + result.p.y
@@ -57,6 +58,11 @@ class SegmentsBuilder
   private addSegment(x1: number, y1: number, x2: number, y2: number)
   {
     this.segments.push(new WireSegment(x1, y1, x2, y2));
+  }
+
+  private wireDescription(): string
+  {
+    return 'Wire from ' + this.ins.join(', ') + ' to ' + this.outs.join(', ');
   }
 
   private outputToInput(path: string)
@@ -70,14 +76,20 @@ class SegmentsBuilder
       case 'H':
         if (y1 !== y2)
         {
-          throw new Error(`Emulator error: for wire, the connectors do not line up (${y1} vs ${y2}).`);
+          throw new Error(
+            `Emulator error: for wire, the connectors do not line up (${y1} vs ${y2}).`
+            + `\nIn ${this.wireDescription()}`
+          );
         }
         this.addSegment(x1, y1, x2, y2);
         break;
       case 'V':
         if (x1 !== x2)
         {
-          throw new Error(`Emulator error: for wire, the connectors do not line up (${x1} vs ${x2}).`);
+          throw new Error(
+            `Emulator error: for wire, the connectors do not line up (${x1} vs ${x2}).`
+            + `\nIn ${this.wireDescription()}`
+          );
         }
         this.addSegment(x1, y1, x2, y2);
         break;
@@ -154,6 +166,7 @@ class SegmentsBuilder
           // This should be followed by a number which is the output number,
           // followed by 'x', 'y', or 'xy'.
           idx = parseInt(arr[i + 1]);
+          console.log(this.wireDescription(), idx);
           switch (arr[i + 2])
           {
             case 'x':
@@ -267,11 +280,14 @@ class WireView extends React.Component<{ c: Wire, d: Datapath }>
   {
     const busValue = this.props.c.bus.displayValue;
     let className = 'active';
-    if (busValue === BusException.Inactive) {
+    if (busValue === BusException.Inactive)
+    {
       className = 'inactive';
-    } else if (busValue === BusException.Conflict) {
+    } else if (busValue === BusException.Conflict)
+    {
       className = 'conflict';
-    } else if (busValue === '0' || busValue === 'false') {
+    } else if (busValue === '0' || busValue === 'false')
+    {
       className += ' low';
     }
     className += ' wire';

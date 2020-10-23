@@ -9,7 +9,7 @@ export class Control extends LogicComponent
   // Values that this control can be. If undefined, then this is a simple 
   // true/false control.
   #options: Array<string> | undefined;
-  readonly width: number = 60;
+  readonly width: number;
   readonly height: number = 20;
   // 0,1 for bool control, 0-len for option control.
   #value: number = 0;
@@ -20,8 +20,7 @@ export class Control extends LogicComponent
     id: string,
     x: number,
     y: number,
-    params: any,
-    )
+    params: any)
   {
     super("Control", id, x, y);
 
@@ -31,6 +30,7 @@ export class Control extends LogicComponent
     this.name = name;
     let options = params.options;
     this.#options = options;
+    this.width = params.wid || 60;
 
     if (this.#options !== undefined)
     {
@@ -114,7 +114,8 @@ class ControlView extends React.Component<{ c: Control, d: Datapath }>
     const hy = y + height - offset;
     const labelStyle = { x: vx, y: hy };
     const rectClass = 'control ' + (active ? 'active' : 'inactive');
-    const handleClick = () => {
+    const handleClick = () =>
+    {
       this.props.c.toggle();
       this.props.d.eval()
     };

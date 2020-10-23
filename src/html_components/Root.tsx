@@ -2,6 +2,7 @@ import React from 'react';
 import ProgrammerLayout from './ProgrammerLayout';
 import Pico from '../utils/PicoV3';
 import { Datapath, DatapathView } from '../logic/datapath';
+import { PICO } from '../logic/pico';
 
 export default class Root extends React.Component<{ pico: Pico }> {
   render()
@@ -21,6 +22,7 @@ export default class Root extends React.Component<{ pico: Pico }> {
         { inputs: ["and.out"], outputs: ["t0.in"], path: "H" },
       ]
     });
+    datapath.loadDef(PICO);
     return (<DatapathView datapath={datapath}/>)
   }
 }

@@ -78,5 +78,6 @@ export class Bus
   {
     this.#inputs.push(output);
     this.connectedOutputPins.push({ c, p: output });
+    console.error(this.connectedOutputPins);
   }
 }
