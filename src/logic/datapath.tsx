@@ -7,6 +7,7 @@ import { Expand } from './Expand';
 import { And, Or } from './gates';
 import { Incrementer } from './Incrementer';
 import { Latch } from './Latch';
+import { Mux } from './Mux';
 import { Tristate } from './Tristate';
 import { Wire } from './Wire';
 
@@ -33,6 +34,7 @@ const componentTypes: Map<string, ComponentMaker> = new Map([
   ["Expand", (i, x, y, p): LogicComponent => new Expand(i, x, y, p)],
   ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
   ["Latch", (i, x, y, p): LogicComponent => new Latch(i, x, y, p)],
+  ["Mux", (i, x, y, p): LogicComponent => new Mux(i, x, y, p)],
   ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
   ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
 ]);
@@ -77,7 +79,8 @@ export class Datapath
       {
         let [cid, pin] = idef.split('.');
         let comp = findComp(cid);
-        if (comp === undefined) {
+        if (comp === undefined)
+        {
           throw new Error(`Emulator error: could not find a gate with id '${cid}'.`);
         }
         comp.connectOutput(pin, bus);
@@ -86,7 +89,8 @@ export class Datapath
       {
         let [cid, pin] = odef.split('.');
         let comp = findComp(cid);
-        if (comp === undefined) {
+        if (comp === undefined)
+        {
           throw new Error(`Emulator error: could not find a gate with id '${cid}'.`);
         }
         comp.connectInput(pin, bus);
