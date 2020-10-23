@@ -166,7 +166,6 @@ class SegmentsBuilder
           // This should be followed by a number which is the output number,
           // followed by 'x', 'y', or 'xy'.
           idx = parseInt(arr[i + 1]);
-          console.log(this.wireDescription(), idx);
           switch (arr[i + 2])
           {
             case 'x':

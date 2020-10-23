@@ -12,6 +12,8 @@ const x3 = x0 + 40;
 const y3 = y0 + 260;
 
 export const PICO: DatapathDef = {
+  width: 1100,
+  height: 550,
   components: [
     {
       type: 'Mux',
@@ -22,13 +24,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'IncSel',
-      label: 'incsel',
       name: 'incsel',
       x: x1 - 5,
       y: y1 + 35,
       wid: 50,
       top: true,
-      options: []
     },
     {
       type: 'Incrementer',
@@ -56,18 +56,16 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'PCSel',
-      label: 'psel',
       name: 'psel',
       x: x1 + 130,
       y: y1 + 50,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Latch',
       id: 'PC',
-      label: 'PC',
+      name: 'PC',
       x: x1 + 250,
       y: y1 + 5,
       nbits: 7,
@@ -82,24 +80,20 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'FLdPC',
-      label: 'fldpc',
       name: 'fldpc',
       x: x1 + 130,
       y: y1 + 75,
       wid: 50,
       top: false,
-      options: []
     },
     {
       type: 'Control',
       id: 'CLdPC',
-      label: 'cldpc',
       name: 'cldpc',
       x: x1 + 130,
       y: y1 + 100,
       wid: 50,
       top: false,
-      options: []
     },
     {
       type: 'Expand',
@@ -120,13 +114,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdPCA',
-      label: 'rdpca',
       name: 'rdpca',
       x: x1 + 340,
       y: y1 + 10,
       wid: 50,
       top: true,
-      options: []
     },
     {
       type: 'Tristate',
@@ -138,13 +130,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdPCB',
-      label: 'rdpcb',
       name: 'rdpcb',
       x: x1 + 340,
       y: y1 + 100,
       wid: 50,
       top: true,
-      options: []
     },
 
     // TA and IR unit
@@ -160,7 +150,7 @@ export const PICO: DatapathDef = {
     {
       type: 'Latch',
       id: 'S',
-      label: 'S',
+      name: 'S',
       x: x2 + 70,
       y: y2 - 10,
       nbits: 7
@@ -168,13 +158,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'LdS',
-      label: 'lds',
       name: 'lds',
       x: x2 + 60,
       y: y2 + 50,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Tristate',
@@ -186,33 +174,27 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdS',
-      label: 'rds',
       name: 'rds',
       x: x2 + 125,
       y: y2 + 50,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Latch',
       id: 'IR',
-      label: 'IR',
+      name: 'IR',
       x: x2 + 10,
       y: y2 + 100,
-      nbits: 7,
-      isIR: true
     },
     {
       type: 'Control',
       id: 'LdIR',
-      label: 'ldir',
       name: 'ldir',
       x: x2,
       y: y2 + 160,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Expand',
@@ -233,13 +215,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdIR',
-      label: 'rdir',
       name: 'rdir',
       x: x2 + 145,
       y: y2 + 145,
       wid: 40,
       top: true,
-      options: []
     },
     // {
     //   type: 'Decoder',
@@ -252,7 +232,7 @@ export const PICO: DatapathDef = {
     {
       type: 'Latch',
       id: 'Q',
-      label: 'Q',
+      name: 'Q',
       x: x3 + 10,
       y: y3 + 95,
       nbits: 12
@@ -260,13 +240,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'LdQ',
-      label: 'ldq',
       name: 'ldq',
       x: x3,
       y: y3 + 155,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Mux',
@@ -277,18 +255,16 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'ASel',
-      label: 'asel',
       name: 'asel',
       x: x3 + 70,
       y: y3 + 125,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Latch',
       id: 'A',
-      label: 'A',
+      name: 'A',
       x: x3 + 140,
       y: y3 + 80,
       nbits: 12
@@ -296,13 +272,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'LdA',
-      label: 'lda',
       name: 'lda',
       x: x3 + 130,
       y: y3 + 140,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'ALU',
@@ -320,24 +294,22 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'AOp',
-      label: 'op',
       name: 'op',
       x: x3 + 200,
       y: y3 + 175,
       wid: 60,
       top: true,
-      options: ['none', 'ADD', 'AND', 'INC', 'INCB', 'CMA', 'NEG', 'RAL', 'RAR', 'ZERO', 'ONES']
+      options: ['ADD', 'AND', 'INC', 'INCB', 'CMA', 'NEG', 'RAL', 'RAR', 'ZERO', 'ONES']
     },
     {
       type: 'Control',
       id: 'FOp',
-      label: 'fop',
       name: 'fop',
       x: x3 + 120,
       y: y3 + 30,
       wid: 60,
       top: false,
-      options: ['none', 'RDTZ', 'RDC', 'RDZ', 'RDN', 'RDV', 'RDNC', 'RDNZ', 'RDNN', 'RDNV', 'ROT', 'LDZ', 'LDALL', 'LDTZ', 'CLC', 'STC', 'CMC']
+      options: ['RDTZ', 'RDC', 'RDZ', 'RDN', 'RDV', 'RDNC', 'RDNZ', 'RDNN', 'RDNV', 'ROT', 'LDZ', 'LDALL', 'LDTZ', 'CLC', 'STC', 'CMC']
     },
     {
       type: 'Tristate',
@@ -349,13 +321,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdA',
-      label: 'rda',
       name: 'rda',
       x: x3 + 305,
       y: y3 + 95,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Mux',
@@ -366,13 +336,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'TSel',
-      label: 'tsel',
       name: 'tsel',
       x: x3 + 300,
       y: y3 + 195,
       wid: 40,
       top: true,
-      options: []
     },
     // {
     //   type: 'Probe',
@@ -384,7 +352,7 @@ export const PICO: DatapathDef = {
     {
       type: 'Latch',
       id: 'T',
-      label: 'T',
+      name: 'T',
       x: x3 + 360,
       y: y3 + 135,
       nbits: 12
@@ -392,13 +360,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'LdT',
-      label: 'ldt',
       name: 'ldt',
       x: x3 + 350,
       y: y3 + 195,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Tristate',
@@ -410,13 +376,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'RdT',
-      label: 'rdt',
       name: 'rdt',
       x: x3 + 415,
       y: y3 + 175,
       wid: 40,
       top: true,
-      options: []
     },
 
     // Memory section
@@ -430,13 +394,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'AOut',
-      label: 'aout',
       name: 'aout',
       x: x0 + 675,
       y: y0 + 60,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Tristate',
@@ -448,13 +410,11 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'Din',
-      label: 'din',
       name: 'din',
       x: x3 + 415,
       y: y3 + 85,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'Tristate',
@@ -466,18 +426,15 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'Dout',
-      label: 'dout',
       name: 'dout',
       x: x3 + 465,
       y: y3 + 85,
       wid: 40,
       top: true,
-      options: []
     },
     {
       type: 'MainMemory',
       id: 'Mem',
-      label: 'Mem',
       x: x0 + 780,
       y: y0,
       databits: 12,
@@ -490,24 +447,20 @@ export const PICO: DatapathDef = {
     {
       type: 'Control',
       id: 'MemR',
-      label: 'memr',
       name: 'memr',
       x: x0 + 675,
       y: y0 + 100,
       wid: 60,
       top: false,
-      options: []
     },
     {
       type: 'Control',
       id: 'MemW',
-      label: 'memw',
       name: 'memw',
       x: x0 + 675,
       y: y0 + 125,
       wid: 60,
       top: false,
-      options: []
     },
   ],
   wires: [

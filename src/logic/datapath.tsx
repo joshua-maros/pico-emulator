@@ -14,6 +14,8 @@ import { Wire } from './Wire';
 
 export interface DatapathDef
 {
+  width?: number,
+  height?: number,
   components: Array<any & {
     type: string,
     id: string,
@@ -48,6 +50,8 @@ export class Datapath
   #wires: Array<Wire> = [];
   #buses: Array<Bus> = [];
   changeListener: () => void = () => { };
+  public width: number = 800;
+  public height: number = 600;
 
   get components(): Array<LogicComponent>
   {
@@ -101,6 +105,14 @@ export class Datapath
       let wire = new Wire(bus, wdef.path, wdef.inputs, wdef.outputs);
       this.#buses.push(bus);
       this.#wires.push(wire);
+    }
+    if (def.width)
+    {
+      this.width = def.width;
+    }
+    if (def.height)
+    {
+      this.height = def.height;
     }
     // Eval once to show the initial state of the datapath.
     this.eval();
@@ -159,8 +171,9 @@ export class DatapathView extends React.Component<{ datapath: Datapath }>
       children.push(w.render('wire' + key, this.props.datapath));
       key += 1;
     }
+    let { width, height } = this.props.datapath;
 
-    return (<svg className="datapath" width={1000}>
+    return (<svg className="datapath" width={width} height={height}>
       {children}
     </svg>);
   }

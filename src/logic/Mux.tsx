@@ -54,8 +54,8 @@ class MuxView extends React.Component<{ c: Mux, d: Datapath }>
     const xfrm = 'translate(' + x + ',' + y + ')';
     return (
       <g transform={xfrm} className="component">
-        <text key={1} className="label">0</text>
-        <text key={2} className="label">1</text>
+        <text key={1} x={3} y={20} className="label">0</text>
+        <text key={2} x={3} y={42} className="label">1</text>
         <line key={3} x1={0} y1={0} x2={0} y2={50} />
         <line key={4} x1={0} y1={0} x2={20} y2={10} />
         <line key={5} x1={0} y1={50} x2={20} y2={40} />
