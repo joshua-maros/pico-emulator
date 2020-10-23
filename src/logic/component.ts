@@ -155,6 +155,9 @@ export abstract class LogicComponent
   // value is only stored at the end of the clock cycle.
   public evalClock() { }
 
+  // Called when the user requests the processor to be reset.
+  public reset() { }
+
   // Connects the input with the given name to the provided bus, if it exists.
   // An error is thrown if it does not exist.
   public connectInput(name: string, bus: Bus)

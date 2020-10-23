@@ -5,6 +5,7 @@ import { Bus } from "./connections";
 import { Control } from './control';
 import { And, Or } from './gates';
 import { Incrementer } from './Incrementer';
+import { Latch } from './Latch';
 import { Tristate } from './Tristate';
 import { Wire } from './Wire';
 
@@ -29,6 +30,7 @@ const componentTypes: Map<string, ComponentMaker> = new Map([
   ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
   ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
   ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
+  ["Latch", (i, x, y, p): LogicComponent => new Latch(i, x, y, p)],
   ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
   ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
 ]);
