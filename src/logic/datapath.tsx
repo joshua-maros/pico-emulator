@@ -118,6 +118,7 @@ export class Datapath
     {
       this.height = def.height;
     }
+    this.reset();
     // Eval once to show the initial state of the datapath.
     this.eval();
   }
@@ -137,6 +138,15 @@ export class Datapath
     this.#wires.push(wire);
   }
 
+  // Resets all components.
+  public reset()
+  {
+    for (let c of this.#components)
+    {
+      c.reset();
+    }
+  }
+
   // Evaluates all components, propogating any changes made by the user or
   // the program.
   public eval()
@@ -150,6 +160,15 @@ export class Datapath
       }
     }
     this.changeListener();
+  }
+
+  // Does a clock signal without doing eval before or after.
+  public clock()
+  {
+    for (let c of this.#components)
+    {
+      c.evalClock();
+    }
   }
 }
 

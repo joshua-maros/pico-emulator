@@ -69,7 +69,7 @@ export const PICO: DatapathDef = {
       x: x1 + 250,
       y: y1 + 5,
       nbits: 7,
-      powerOnReset: true
+      resetValue: 0,
     },
     {
       type: 'AndOr',

@@ -1,0 +1,27 @@
+.root {
+  display: grid;
+  max-width: 50em;
+  margin: auto;
+  grid-row-gap: 1em;
+  row-gap: 1em;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-column-gap: 0.5em;
+  column-gap: 0.5em;
+  grid-row-gap: 0.5em;
+  row-gap: 0.5em;
+}
+
+.actions button {
+  white-space: nowrap;
+}
+
+.label {
+  text-align: right;
+  height: min-content;
+  margin-top: auto;
+  margin-bottom: auto;
+}

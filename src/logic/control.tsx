@@ -67,6 +67,11 @@ export class Control extends LogicComponent
     }
   }
 
+  public reset()
+  {
+    this.#value = 0;
+  }
+
   get label()
   {
     if (this.#options === undefined)

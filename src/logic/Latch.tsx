@@ -19,6 +19,10 @@ export class Latch extends LogicComponent
     super("Latch", id, x, y);
     this.name = params.name || "Unnamed";
     this.resetValue = params.resetValue;
+    if (this.resetValue !== undefined)
+    {
+      this.resetValue = '' + this.resetValue;
+    }
     this.nbits = params.nbits;
   }
 
