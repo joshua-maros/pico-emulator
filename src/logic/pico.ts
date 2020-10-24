@@ -285,12 +285,12 @@ export const PICO: DatapathDef = {
       y: y3 + 75,
       nBits: 12
     },
-    // {
-    //   type: 'FlagLogic',
-    //   id: 'Flags',
-    //   x: x3 + 200,
-    //   y: y3 + 25
-    // },
+    {
+      type: 'FlagLogic',
+      id: 'Flags',
+      x: x3 + 200,
+      y: y3 + 25
+    },
     {
       type: 'Control',
       id: 'AOp',
@@ -342,13 +342,13 @@ export const PICO: DatapathDef = {
       wid: 40,
       top: true,
     },
-    // {
-    //   type: 'Probe',
-    //   id: 'ViewALU',
-    //   x: x3 + 300,
-    //   y: y3 + 10,
-    //   wid: 80
-    // },
+    {
+      type: 'Probe',
+      id: 'ViewALU',
+      x: x3 + 300,
+      y: y3 + 10,
+      wid: 80
+    },
     {
       type: 'Latch',
       id: 'T',
@@ -498,14 +498,14 @@ export const PICO: DatapathDef = {
     { inputs: ['ASel.out'], outputs: ['MAcc.sel'], path: 'V' },
     { inputs: ['LdA.out'], outputs: ['A.load'], path: 'V' },
     { inputs: ['MAcc.out'], outputs: ['A.in'], path: 'H' },
-    // { inputs: ['ALU.flags'], outputs: ['Flags.in'], path: 'V' },
+    { inputs: ['ALU.flags'], outputs: ['Flags.in'], path: 'HVH' },
     { inputs: ['AOp.out'], outputs: ['ALU.op'], path: 'V' },
-    // { inputs: ['FOp.out'], outputs: ['Flags.op'], path: 'H' },
-    // {
-    //   inputs: ['Flags.out'],
-    //   outputs: ['ALU.cin', 'LPC.in2'],
-    //   path: 'i 0 xy u 10 ^ 0 xy r 40 d 150 o 0 x o 0 xy ; $ 0 o 1 x l 10 o 1 y o 1 xy'
-    // },
+    { inputs: ['FOp.out'], outputs: ['Flags.op'], path: 'H' },
+    {
+      inputs: ['Flags.out'],
+      outputs: ['ALU.cin', 'LPC.in2'],
+      path: 'i 0 xy u 10 ^ 0 xy r 40 d 150 o 0 x o 0 xy ; $ 0 o 1 x l 10 o 1 y o 1 xy'
+    },
     { inputs: ['RdA.out'], outputs: ['Acc2D.enable'], path: 'V' },
     {
       inputs: ['A.out'],
@@ -515,8 +515,8 @@ export const PICO: DatapathDef = {
     { inputs: ['TSel.out'], outputs: ['MT.sel'], path: 'V' },
     {
       inputs: ['ALU.out'],
-      outputs: ['MT.in1', 'MAcc.in0', /* 'ViewALU.in' */],
-      path: 'HVH' /*'o 1 xy l 20 u 70 r 220 ^ 0 x o 2 y i 0 y o 0 y o 0 xy ; i 0 xy $ 0 ; o 2 xy $ 0'*/
+      outputs: ['MT.in1', 'MAcc.in0', 'ViewALU.in'],
+      path: 'o 1 xy l 20 u 70 r 220 ^ 0 x o 2 y i 0 y o 0 y o 0 xy ; i 0 xy $ 0 ; o 2 xy $ 0'
     },
     { inputs: ['LdT.out'], outputs: ['T.load'], path: 'V' },
     { inputs: ['MT.out'], outputs: ['T.in'], path: 'HVH' },

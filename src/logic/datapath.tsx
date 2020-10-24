@@ -4,11 +4,13 @@ import { LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
 import { Expand } from './Expand';
+import { FlagLogic } from './FlagLogic';
 import { And, AndOr, Or } from './gates';
 import { Incrementer } from './Incrementer';
 import { Latch } from './Latch';
 import { MainMemory } from './MainMemory';
 import { Mux } from './Mux';
+import { Probe } from './Probe';
 import { Tristate } from './Tristate';
 import { Wire } from './Wire';
 
@@ -32,15 +34,17 @@ export interface DatapathDef
 type ComponentMaker = (id: string, x: number, y: number, params: Map<string, any>) => LogicComponent;
 const componentTypes: Map<string, ComponentMaker> = new Map([
   ["ALU", (i, x, y, p): LogicComponent => new ALU(i, x, y, p)],
-  ["And", (i, x, y, p): LogicComponent => new AndOr(i, x, y, p)],
-  ["AndOr", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
+  ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
+  ["AndOr", (i, x, y, p): LogicComponent => new AndOr(i, x, y, p)],
   ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
   ["Expand", (i, x, y, p): LogicComponent => new Expand(i, x, y, p)],
+  ["FlagLogic", (i, x, y, p): LogicComponent => new FlagLogic(i, x, y, p)],
   ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
   ["Latch", (i, x, y, p): LogicComponent => new Latch(i, x, y, p)],
   ["MainMemory", (i, x, y, p): LogicComponent => new MainMemory(i, x, y, p)],
   ["Mux", (i, x, y, p): LogicComponent => new Mux(i, x, y, p)],
   ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
+  ["Probe", (i, x, y, p): LogicComponent => new Probe(i, x, y, p)],
   ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
 ]);
 

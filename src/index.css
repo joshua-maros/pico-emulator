@@ -75,6 +75,14 @@ code {
   font-size: 16px;
 }
 
+.datapath .flag-label {
+  fill: #000;
+  stroke: none;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: bold;
+}
+
 .datapath .value {
   fill: #22F;
   stroke: none;
@@ -95,7 +103,9 @@ code {
 }
 
 .datapath .wire.inactive {
-  stroke-dasharray: 4px 2px;
+
+  stroke-dasharray: 1px 2px;
+  stroke-width: 1px;
 }
 
 .datapath .wire.active.low {
