@@ -1,5 +1,4 @@
 import React from 'react';
-import { asUnsignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 

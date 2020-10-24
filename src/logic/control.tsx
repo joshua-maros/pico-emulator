@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, LogicComponent, Output } from "./component";
+import { LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
 export class Control extends LogicComponent

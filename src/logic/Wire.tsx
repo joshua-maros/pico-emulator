@@ -1,5 +1,4 @@
 import React from 'react';
-import { Input, LogicComponent, Output } from "./component";
 import { Bus, BusException } from './connections';
 import { Datapath } from './datapath';
 

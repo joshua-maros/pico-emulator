@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, LogicComponent, Output } from "./component";
+import { Input, LogicComponent } from "./component";
 import { Datapath } from './datapath';
 
 export class Probe extends LogicComponent

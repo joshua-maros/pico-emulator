@@ -1,5 +1,4 @@
 import React from 'react';
-import ProgrammerLayout from './ProgrammerLayout';
 import Pico from '../utils/PicoV3';
 import { Datapath, DatapathView } from '../logic/datapath';
 import { PICO } from '../logic/pico';
