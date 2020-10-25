@@ -12,8 +12,6 @@ type Props = {
 type State = {}
 
 export default class DatapathLayout extends React.Component<Props, State> {
-  textBoxRef: React.RefObject<HTMLInputElement> = React.createRef();
-
   render()
   {
     const datapath = this.props.datapath;

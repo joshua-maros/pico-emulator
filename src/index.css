@@ -91,7 +91,7 @@ code {
   font-size: 16px;
 }
 
-.datapath .flag-label {
+.datapath .small-label {
   fill: #000;
   stroke: none;
   font-family: monospace;

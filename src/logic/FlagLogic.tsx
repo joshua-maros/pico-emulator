@@ -196,9 +196,9 @@ class FlagLogicView extends React.Component<{ c: FlagLogic, d: Datapath }>
     return (
       <g transform={xfrm} className="component">
         <path d='M0 0 H 60 V 30 H 0 Z' />
-        <text className="flag-label" x={30} y={10} textAnchor="middle"  >{outStr}</text>
-        <text className="flag-label" x={30} y={19} textAnchor="middle" >T V C Z N</text>
-        <text className="flag-label" x={30} y={28} textAnchor="middle" >{inStr}</text>
+        <text className="small-label" x={30} y={10} textAnchor="middle"  >{outStr}</text>
+        <text className="small-label" x={30} y={19} textAnchor="middle" >T V C Z N</text>
+        <text className="small-label" x={30} y={28} textAnchor="middle" >{inStr}</text>
       </g>);
   }
 };

@@ -129,10 +129,11 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     for (const reg of datapath.visibleRegisters)
     {
       sidebarItems.push((
-        <div className={style.label}>{reg.label}</div>
+        <div key={reg.label + '_label'} className={style.label}>{reg.label}</div>
       ));
       sidebarItems.push((
         <MemoryCellView
+          key={reg.label + '_value'}
           cell={reg}
           onClick={() => this.state.focusCell(reg, undefined)}
           focused={reg === this.state.editing.cell}
@@ -142,10 +143,10 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     for (const flag of datapath.visibleFlags)
     {
       sidebarItems.push((
-        <div className={style.label}>{flag.label}</div>
+        <div key={flag.label + '_label'} className={style.label}>{flag.label}</div>
       ));
       sidebarItems.push((
-        <FlagCellView flag={flag} />
+        <FlagCellView key={flag.label + '_value'} flag={flag} />
       ));
     }
 

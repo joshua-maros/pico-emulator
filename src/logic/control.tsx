@@ -102,6 +102,37 @@ export class Control extends LogicComponent
     }
   }
 
+  // Use the value returned by this in setValue(). It will throw an error if 
+  // you cannot use the specified setting on this control.
+  public getValueOfOption(option: boolean | string): number
+  {
+    if (this.#options === undefined)
+    {
+      if (option === true) return 1;
+      else if (option === false) return 0;
+      else throw new Error(this.name + ' does not have custom options, you must use true/false instead.');
+    }
+    else
+    {
+      if (typeof option === 'boolean')
+        throw new Error(this.name + ' has custom options, it cannot be set with true/false.');
+      for (let i = 0; i < this.#options.length; i++)
+      {
+        if (this.#options[i] === option)
+        {
+          return i;
+        }
+      }
+      throw new Error(this.name + ' has no option named ' + option);
+    }
+  }
+
+  // This function does not check if the provided value is valid.
+  public setValue(value: number)
+  {
+    this.#value = value;
+  }
+
   public render(k: string, d: Datapath)
   {
     return (<ControlView key={k} c={this} d={d} />)
@@ -122,13 +153,15 @@ class ControlView extends React.Component<{ c: Control, d: Datapath }>
     const rectClass = 'control ' + (active ? 'active' : 'inactive');
     const handleClick = () =>
     {
+      // Turn off the decoder if the user wants to change something manually.
+      this.props.d.decoderEnabled = false;
       this.props.c.toggle();
       this.props.d.eval()
     };
     return (
-      <g className="component">
-        <rect className={rectClass} x={lx} y={ly} width={width} height={height} onClick={handleClick} />
-        <text className="label" {...labelStyle} onClick={handleClick}>{label}</text>
+      <g className="component" onClick={handleClick}>
+        <rect className={rectClass} x={lx} y={ly} width={width} height={height} />
+        <text className="label" {...labelStyle}>{label}</text>
       </g>);
   }
 };

@@ -4,6 +4,7 @@ import { ALU } from './ALU';
 import { LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
+import { Decoder, UnparsedDecoderMicrocode } from './Decoder';
 import { Expand } from './Expand';
 import { FlagLogic } from './FlagLogic';
 import { And, AndOr, Or } from './gates';
@@ -29,7 +30,8 @@ export interface DatapathDef
     inputs: Array<string>,
     outputs: Array<string>,
     path: string,
-  }>
+  }>,
+  microcode?: UnparsedDecoderMicrocode,
 }
 
 type ComponentMaker = (d: Datapath, id: string, x: number, y: number, params: Map<string, any>) => LogicComponent;
@@ -38,6 +40,7 @@ const componentTypes: Map<string, ComponentMaker> = new Map([
   ["And", (d, i, x, y, p): LogicComponent => new And(d, i, x, y, p)],
   ["AndOr", (d, i, x, y, p): LogicComponent => new AndOr(d, i, x, y, p)],
   ["Control", (d, i, x, y, p): LogicComponent => new Control(d, i, x, y, p)],
+  ["Decoder", (d, i, x, y, p): LogicComponent => new Decoder(d, i, x, y, p)],
   ["Expand", (d, i, x, y, p): LogicComponent => new Expand(d, i, x, y, p)],
   ["FlagLogic", (d, i, x, y, p): LogicComponent => new FlagLogic(d, i, x, y, p)],
   ["Incrementer", (d, i, x, y, p): LogicComponent => new Incrementer(d, i, x, y, p)],
@@ -62,6 +65,7 @@ export class Datapath
   public visibleRegisters: Array<MemoryCell> = [];
   public mainMemoryBlock: Array<MemoryCell> = [];
   public controls: Array<Control> = [];
+  public decoder: Decoder | undefined = undefined;
   public lastMessage = "Processor initialized.";
   public lastMessageWasError: boolean = false;
 
@@ -137,9 +141,24 @@ export class Datapath
     {
       this.height = def.height;
     }
+    if (def.microcode)
+    {
+      this.decoder?.loadMicrocode(def.microcode);
+    }
     this.reset();
-    // Eval once to show the initial state of the datapath.
-    this.eval();
+  }
+
+  public set decoderEnabled(value: boolean)
+  {
+    if (this.decoder !== undefined)
+    {
+      this.decoder.enabled = value;
+    }
+  }
+
+  public get decoderEnabled(): boolean
+  {
+    return this.decoder?.enabled || false;
   }
 
   public addComponent(component: LogicComponent)
@@ -157,13 +176,14 @@ export class Datapath
     this.#wires.push(wire);
   }
 
-  // Resets all components.
+  // Resets all components, propogating changes.
   public reset()
   {
     for (let c of this.#components)
     {
       c.reset();
     }
+    this.eval();
   }
 
   // Evaluates all components, propogating any changes made by the user or
@@ -241,12 +261,6 @@ export class Datapath
 
 export class DatapathView extends React.Component<{ datapath: Datapath, className: string }>
 {
-  constructor(props: { datapath: Datapath, className: string })
-  {
-    super(props);
-    props.datapath.changeListener = () => this.forceUpdate();
-  }
-
   render()
   {
     let key = 0;

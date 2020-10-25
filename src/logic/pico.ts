@@ -235,12 +235,12 @@ export const PICO: DatapathDef = {
       wid: 40,
       top: true,
     },
-    // {
-    //   type: 'Decoder',
-    //   id: 'Dec',
-    //   x: x2 + 80,
-    //   y: y2 + 145
-    // },
+    {
+      type: 'Decoder',
+      id: 'Dec',
+      x: x2 + 80,
+      y: y2 + 145
+    },
 
     // Arithmetic section
     {
@@ -497,8 +497,8 @@ export const PICO: DatapathDef = {
     { inputs: ['RdIR.out'], outputs: ['IR2A.enable'], path: 'V' },
     {
       inputs: ['IR.out'],
-      outputs: ['ExIR.in', /* 'Dec.in' */],
-      path: 'i 0 xy r 20 ^ 0 xy o 0 xy ;' /* $ 0 o 1 y o 1 xy' */
+      outputs: ['ExIR.in', 'Dec.in'],
+      path: 'i 0 xy r 20 ^ 0 xy o 0 xy ; $ 0 o 1 y o 1 xy'
     },
     { inputs: ['LdQ.out'], outputs: ['Q.load'], path: 'V' },
     { inputs: ['Q.out'], outputs: ['MAcc.in1'], path: 'H' },
@@ -560,5 +560,12 @@ export const PICO: DatapathDef = {
       outputs: ['Mem.memw'],
       path: 'H'
     }
-  ]
+  ],
+  microcode: {
+    clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3'],
+    fetchCycleStep: 'rdpca,aout,memr,din,ldir',
+    instructions: [
+      'CLA;op:ZERO,lda;fldpc'
+    ],
+  }
 };

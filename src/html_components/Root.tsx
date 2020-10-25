@@ -37,6 +37,7 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
       {
         alert('Error encountered while loading file:\n' + error);
       }
+      this.props.datapath.eval();
     });
   }
 
@@ -52,6 +53,7 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
     link.href = href;
     link.click();
     link.remove();
+    this.props.datapath.eval();
   }
 
   private toggleLayout()
