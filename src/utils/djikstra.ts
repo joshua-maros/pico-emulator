@@ -1,7 +1,5 @@
 // Utility for performing pathfinding with Djikstra's algorithm.
 
-import { connect } from "http2";
-
 class Node
 {
   public connections: Array<number> = [];

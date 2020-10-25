@@ -2,13 +2,7 @@
 // datapath and just want to prorgram the processor.
 
 import React from 'react';
-import MemoryGrid from './MemoryGrid';
-import Pico from '../utils/PicoV3';
 import style from './DatapathLayout.module.css';
-import RegisterCell from './RegisterCell';
-import FlagCell from './FlagCell';
-import PicoReg from '../utils/PicoReg';
-import csvio from '../utils/csvio';
 import { Datapath, DatapathView } from '../logic/datapath';
 
 type Props = {
@@ -19,11 +13,6 @@ type State = {}
 
 export default class DatapathLayout extends React.Component<Props, State> {
   textBoxRef: React.RefObject<HTMLInputElement> = React.createRef();
-
-  constructor(props: Props)
-  {
-    super(props);
-  }
 
   render()
   {

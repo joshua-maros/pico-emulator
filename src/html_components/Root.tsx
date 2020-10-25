@@ -1,6 +1,6 @@
 import React from 'react';
 import Pico from '../utils/PicoV3';
-import { Datapath, DatapathView } from '../logic/datapath';
+import { Datapath } from '../logic/datapath';
 import { PICO } from '../logic/pico';
 import DatapathLayout from './DatapathLayout';
 
