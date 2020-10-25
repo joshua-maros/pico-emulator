@@ -62,6 +62,8 @@ export class Datapath
   public visibleRegisters: Array<MemoryCell> = [];
   public mainMemoryBlock: Array<MemoryCell> = [];
   public controls: Array<Control> = [];
+  public lastMessage = "Processor initialized.";
+  public lastMessageWasError: boolean = false;
 
   // Are we 'running' the code for a processor?
   #running = false;

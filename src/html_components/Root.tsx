@@ -3,6 +3,7 @@ import Pico from '../utils/PicoV3';
 import { Datapath } from '../logic/datapath';
 import { PICO } from '../logic/pico';
 import DatapathLayout from './DatapathLayout';
+import ProgrammerLayout from './ProgrammerLayout';
 
 export default class Root extends React.Component<{ pico: Pico }> {
   render()
@@ -23,6 +24,6 @@ export default class Root extends React.Component<{ pico: Pico }> {
       ]
     });
     datapath.loadDef(PICO);
-    return (<DatapathLayout datapath={datapath}/>)
+    return (<div><DatapathLayout datapath={datapath} /> <ProgrammerLayout datapath={datapath} /> </div>)
   }
 }

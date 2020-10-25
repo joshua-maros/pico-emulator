@@ -1,14 +1,15 @@
+import { MemoryCell } from "./memory_cells";
 import PicoMemory from "./PicoMemory";
 
 
-function saveMem(mem: PicoMemory): string
+function saveMem(mem: Array<MemoryCell>): string
 {
   let data = '';
   let lastItemWasInitialized = true;
-  for (let index = 0; index < 128; index++)
+  for (let index = 0; index < mem.length; index++)
   {
-    let item = mem.get(index);
-    if (item.initialized)
+    let item = mem[index];
+    if (item.value !== undefined)
     {
       if (lastItemWasInitialized)
       {
@@ -20,7 +21,7 @@ function saveMem(mem: PicoMemory): string
       }
       data += item.value + '\n';
     }
-    lastItemWasInitialized = item.initialized;
+    lastItemWasInitialized = item.value !== undefined;
   }
   return data;
 }
@@ -37,9 +38,12 @@ function trimQuotes(text: string): string
 }
 
 // Returns an error message if the file is poorly formatted.
-function loadMem(mem: PicoMemory, file: string): string | null
+function loadMem(mem: Array<MemoryCell>, file: string): string | null
 {
-  mem.clear();
+  for (const cell of mem)
+  {
+    cell.value = undefined;
+  }
 
   const READING_NUMBER = 1;
   const READING_DATA = 2;
@@ -103,7 +107,10 @@ function loadMem(mem: PicoMemory, file: string): string | null
         // index. This allows putting a number and then the value contained in
         // it on the next line.
         if (trimmedData.length === 0) continue;
-        mem.get(currentIndex).value = trimmedData.toUpperCase();
+        if (trimmedData !== '?')
+        {
+          mem[currentIndex].value = trimmedData.toUpperCase();
+        }
         currentIndex += 1;
       }
       else

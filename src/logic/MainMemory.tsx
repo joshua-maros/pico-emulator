@@ -25,7 +25,7 @@ export class MainMemory extends LogicComponent
     this.#cells = [];
     for (let i = 0; i < this.length; i++)
     {
-      this.#cells.push(new MemoryCell(`Memory Cell #{i}`));
+      this.#cells.push(new MemoryCell(`Memory Cell ${i}`));
     }
     d.mainMemoryBlock = this.#cells;
 

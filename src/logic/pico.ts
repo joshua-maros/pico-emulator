@@ -70,6 +70,7 @@ export const PICO: DatapathDef = {
       y: y1 + 5,
       nbits: 7,
       resetValue: 0,
+      visible: true,
     },
     {
       type: 'AndOr',
@@ -137,6 +138,18 @@ export const PICO: DatapathDef = {
       top: true,
     },
 
+    // We insert this here so that it is displayed before Q and IR in the
+    // programmer view.
+    {
+      type: 'Latch',
+      id: 'ACC',
+      name: 'ACC',
+      x: x3 + 140,
+      y: y3 + 80,
+      nbits: 12,
+      visible: true,
+    },
+
     // TA and IR unit
     {
       type: 'Expand',
@@ -186,6 +199,7 @@ export const PICO: DatapathDef = {
       name: 'IR',
       x: x2 + 10,
       y: y2 + 100,
+      visible: true,
     },
     {
       type: 'Control',
@@ -235,7 +249,8 @@ export const PICO: DatapathDef = {
       name: 'Q',
       x: x3 + 10,
       y: y3 + 95,
-      nbits: 12
+      nbits: 12,
+      visible: true,
     },
     {
       type: 'Control',
@@ -260,14 +275,6 @@ export const PICO: DatapathDef = {
       y: y3 + 125,
       wid: 40,
       top: true,
-    },
-    {
-      type: 'Latch',
-      id: 'A',
-      name: 'A',
-      x: x3 + 140,
-      y: y3 + 80,
-      nbits: 12
     },
     {
       type: 'Control',
@@ -496,8 +503,8 @@ export const PICO: DatapathDef = {
     { inputs: ['LdQ.out'], outputs: ['Q.load'], path: 'V' },
     { inputs: ['Q.out'], outputs: ['MAcc.in1'], path: 'H' },
     { inputs: ['ASel.out'], outputs: ['MAcc.sel'], path: 'V' },
-    { inputs: ['LdA.out'], outputs: ['A.load'], path: 'V' },
-    { inputs: ['MAcc.out'], outputs: ['A.in'], path: 'H' },
+    { inputs: ['LdA.out'], outputs: ['ACC.load'], path: 'V' },
+    { inputs: ['MAcc.out'], outputs: ['ACC.in'], path: 'H' },
     { inputs: ['ALU.flags'], outputs: ['Flags.in'], path: 'HVH' },
     { inputs: ['AOp.out'], outputs: ['ALU.op'], path: 'V' },
     { inputs: ['FOp.out'], outputs: ['Flags.op'], path: 'H' },
@@ -508,7 +515,7 @@ export const PICO: DatapathDef = {
     },
     { inputs: ['RdA.out'], outputs: ['Acc2D.enable'], path: 'V' },
     {
-      inputs: ['A.out'],
+      inputs: ['ACC.out'],
       outputs: ['ALU.in0', 'Acc2D.in'],
       path: 'i 0 xy r 20 ^ 0 xy ^ 1 x o 0 xy ; o 1 xy $ 1 $ 0'
     },

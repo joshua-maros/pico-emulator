@@ -3,23 +3,23 @@
 
 import React from 'react';
 import MemoryGrid from './MemoryGrid';
+import Pico from '../utils/PicoV3';
 import style from './ProgrammerLayout.module.css';
 import MemoryCellView from './MemoryCellView';
 import FlagCellView from './FlagCellView';
+import PicoReg from '../utils/PicoReg';
 import csvio from '../utils/csvio';
-import { Datapath } from '../logic/datapath';
-import { MemoryCell } from '../utils/memory_cells';
 
 type Props = {
-  datapath: Datapath
+  pico: Pico
 };
 
 type State = {
   editing: {
-    cell: MemoryCell,
-    memoryIndex: number | undefined,
+    register: PicoReg,
+    memoryIndex: number | null,
   }
-  focusCell: (cell: MemoryCell, memoryIndex: number | undefined) => void,
+  focusRegister: (register: PicoReg, memoryIndex: number | null) => void,
 }
 
 export default class ProgrammerLayout extends React.Component<Props, State> {
@@ -30,15 +30,15 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     super(props);
     this.state = {
       editing: {
-        cell: props.datapath.mainMemoryBlock[0],
+        register: props.pico.memory.get(0),
         memoryIndex: 0,
       },
-      focusCell: (cell: MemoryCell, memoryIndex: number | undefined) =>
+      focusRegister: (register: PicoReg, memoryIndex: number | null) =>
       {
         this.setState(
           state =>
           {
-            state.editing.cell = cell;
+            state.editing.register = register;
             state.editing.memoryIndex = memoryIndex;
             return state;
           },
@@ -53,12 +53,12 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
 
   componentDidMount()
   {
-    this.props.datapath.changeListener = () => this.forceUpdate();
+    this.props.pico.onChange = () => this.forceUpdate();
   }
 
   componentWillUnmount()
   {
-    this.props.datapath.changeListener = () => { };
+    this.props.pico.onChange = () => { };
   }
 
   selectTextBox()
@@ -67,33 +67,20 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     this.textBoxRef.current?.select();
   }
 
-  shiftMemoryDown(at: number)
-  {
-    const mem = this.props.datapath.mainMemoryBlock;
-    for (let targetIndex = mem.length - 1; targetIndex > at; targetIndex--)
-    {
-      mem[targetIndex].value = mem[targetIndex - 1].value;
-    }
-    mem[at].value = undefined;
-    this.forceUpdate();
-  }
-
-  shiftMemoryUp(at: number)
-  {
-    const mem = this.props.datapath.mainMemoryBlock;
-    for (let targetIndex = at; targetIndex < mem.length - 1; targetIndex++)
-    {
-      mem[targetIndex].value = mem[targetIndex + 1].value;
-    }
-    mem[mem.length - 1].value = undefined;
-    this.forceUpdate();
-  }
-
   render()
   {
-    const datapath = this.props.datapath;
-    let editingLabel = this.state.editing.cell.label;
-    let isEditingMemory = this.state.editing.memoryIndex !== undefined;
+    let pico = this.props.pico;
+    let editingLabel = this.state.editing.register.label;
+    let editingMemoryCell = this.state.editing.memoryIndex !== null;
+
+    const makeRegisterCell = (register: PicoReg) =>
+    {
+      return (<MemoryCellView
+        reg={register}
+        onClick={() => this.state.focusRegister(register, null)}
+        focused={register === this.state.editing.register}
+      />);
+    };
 
     const changeValue = (event: React.ChangeEvent<HTMLInputElement>) =>
     {
@@ -101,7 +88,7 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       this.setState(
         state =>
         {
-          state.editing.cell.value = value;
+          state.editing.register.value = value;
           return state;
         }
       );
@@ -113,10 +100,10 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       this.setState(
         state =>
         {
-          if (state.editing.memoryIndex === undefined) return state;
+          if (state.editing.memoryIndex === null) return state;
           if (state.editing.memoryIndex === 127) return state;
           state.editing.memoryIndex += 1;
-          state.editing.cell = datapath.mainMemoryBlock[state.editing.memoryIndex];
+          state.editing.register = pico.memory.get(state.editing.memoryIndex);
           return state;
         },
         () =>
@@ -142,7 +129,7 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       if (!file) return;
       file.text().then((text: string) =>
       {
-        let error = csvio.loadMem(datapath.mainMemoryBlock, text);
+        let error = csvio.loadMem(pico.memory, text);
         this.forceUpdate();
         if (error)
         {
@@ -153,7 +140,7 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
 
     const saveFile = () => 
     {
-      let contents = csvio.saveMem(datapath.mainMemoryBlock);
+      let contents = csvio.saveMem(pico.memory);
       let blob = new Blob([contents]);
       let href = URL.createObjectURL(blob);
       let link = document.createElement('a');
@@ -162,37 +149,27 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       link.href = href;
       link.click();
       link.remove();
-    };
-
-    let sidebarItems = [];
-    for (const reg of datapath.visibleRegisters)
-    {
-      sidebarItems.push((
-        <div className={style.label}>{reg.label}</div>
-      ));
-      sidebarItems.push((
-        <MemoryCellView
-          cell={reg}
-          onClick={() => this.state.focusCell(reg, undefined)}
-          focused={reg === this.state.editing.cell}
-        />
-      ));
-    }
-    for (const flag of datapath.visibleFlags)
-    {
-      sidebarItems.push((
-        <div className={style.label}>{flag.label}</div>
-      ));
-      sidebarItems.push((
-        <FlagCellView flag={flag} />
-      ));
     }
 
     return (
       <div className={style.root}>
         <div className={style.processor}>
           <div className={style.left_controls}>
-            {sidebarItems}
+            <div className={style.label}>PC</div>
+            {makeRegisterCell(pico.programCounter)}
+            <div className={style.label}>ACC</div>
+            {makeRegisterCell(pico.accumulator)}
+            <div className={style.label}>IR</div>
+            {makeRegisterCell(pico.instructionRegister)}
+            <div className={style.label}>Q</div>
+            {makeRegisterCell(pico.qReg)}
+
+            <div className={style.label}>CARRY</div>
+            <FlagCellView flag={pico.carryFlag} />
+            <div className={style.label}>ZERO</div>
+            <FlagCellView flag={pico.zeroFlag} />
+            <div className={style.label}>NEG</div>
+            <FlagCellView flag={pico.negFlag} />
 
             <div />
             <div style={{ height: '2em' }} />
@@ -202,7 +179,7 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             <div className={style.label}>Value:</div>
             <input
               ref={this.textBoxRef}
-              value={this.state.editing.cell.value}
+              value={this.state.editing.register.value}
               onChange={changeValue}
               onKeyUp={inputKeyUp}
             />
@@ -210,31 +187,31 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             <div />
             <button
               className="flat-button"
-              onClick={() => this.shiftMemoryUp(this.state.editing.memoryIndex || 0)}
-              disabled={!isEditingMemory}
+              onClick={() => { pico.memory.shiftUp(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+              disabled={!editingMemoryCell}
             >Shift Up</button>
             <div />
             <button
               className="flat-button"
-              onClick={() => this.shiftMemoryDown(this.state.editing.memoryIndex || 0)}
-              disabled={!isEditingMemory}
+              onClick={() => { pico.memory.shiftDown(this.state.editing.memoryIndex || 0); this.forceUpdate() }}
+              disabled={!editingMemoryCell}
             >Shift Down</button>
           </div>
           <MemoryGrid
-            memoryBlock={datapath.mainMemoryBlock}
-            onClick={index => this.state.focusCell(datapath.mainMemoryBlock[index], index)}
+            memory={pico.memory}
+            onClick={index => this.state.focusRegister(pico.memory.get(index), index)}
             focusedIndex={this.state.editing.memoryIndex}
           />
         </div>
-        <div className={datapath.lastMessageWasError ? style.error_message : style.info_message}>
-          {datapath.lastMessage}
+        <div className={pico.lastMessageWasError ? style.error_message : style.info_message}>
+          {pico.lastMessage}
         </div>
         <div className={style.actions}>
-          <button className="flat-button" onClick={() => datapath.clock()}>Step</button>
-          <button className="flat-button" onClick={() => datapath.startRunning(false)}>Run</button>
-          <button className="flat-button" onClick={() => datapath.startRunning(true)}>Run Fast</button>
-          <button className="flat-button" onClick={() => datapath.halt()}>Stop</button>
-          <button className="flat-button" onClick={() => datapath.reset()}>Reset</button>
+          <button className="flat-button" onClick={() => pico.step()}>Step</button>
+          <button className="flat-button" onClick={() => pico.startRunning(false)}>Run</button>
+          <button className="flat-button" onClick={() => pico.startRunning(true)}>Run Fast</button>
+          <button className="flat-button" onClick={() => pico.halt()}>Stop</button>
+          <button className="flat-button" onClick={() => pico.reset()}>Reset</button>
           <button className="flat-button" onClick={saveFile}>Save Memory</button>
           <label className="flat-button" htmlFor="file">Load Memory</label>
           <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />
