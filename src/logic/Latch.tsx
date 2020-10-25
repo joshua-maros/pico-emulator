@@ -1,4 +1,5 @@
 import React from 'react';
+import MemoryCell from '../utils/MemoryCell';
 import { asUnsignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
@@ -12,12 +13,13 @@ export class Latch extends LogicComponent
   public readonly name: string;
   public readonly resetValue: string | undefined;
   public readonly nbits: number | undefined;
-  public value: string | undefined = undefined;
+  public data: MemoryCell;
 
   constructor(id: string, x: number, y: number, params: any)
   {
     super("Latch", id, x, y);
     this.name = params.name || "Unnamed";
+    this.data = new MemoryCell(this.name);
     this.resetValue = params.resetValue;
     if (this.resetValue !== undefined)
     {
@@ -28,16 +30,17 @@ export class Latch extends LogicComponent
 
   public eval()
   {
-    this.out.value = this.value;
+    this.out.value = this.data.value;
   }
 
   public evalClock()
   {
+    this.data.clearLastUse();
     if (this.load.asBoolean === true)
     {
       if (this.nbits === undefined)
       {
-        this.value = this.in.value;
+        this.data.value = this.in.value;
       }
       else
       {
@@ -45,15 +48,23 @@ export class Latch extends LogicComponent
         if (value !== undefined)
         {
           value = asUnsignedBits(value, this.nbits);
+          this.data.value = '' + value;
         }
-        this.value = '' + value;
+        else
+        {
+          this.data.value = undefined;
+        }
       }
+      this.data.lastUse = 'write';
+    } else if (this.data.value !== undefined) {
+      this.data.lastUse = 'read';
     }
   }
 
   public reset()
   {
-    this.value = this.resetValue;
+    this.data.value = this.resetValue;
+    this.data.clearLastUse();
   }
 
   public render(k: string, d: Datapath)
@@ -69,12 +80,13 @@ class LatchView extends React.Component<{ c: Latch, d: Datapath }>
     const { x, y } = this.props.c;
     const xfrm = 'translate(' + x + ',' + y + ')';
     const label = this.props.c.name;
-    const value = this.props.c.value || '?';
+    const value = this.props.c.data.value;
+    const fval = value === undefined ? '?' : value;
     return (
       <g transform={xfrm} className="component">
-        <rect x={0} y={0} width={30} height={50} />
+        <rect x={0} y={0} width={30} height={50} className={this.props.c.data.lastUseCssClass} />
         <text className="label" x={15} y={23} textAnchor="middle">{label}</text>
-        <text className="value" x={33} y={7}>{value}</text>
+        <text className="value" x={33} y={7}>{fval}</text>
       </g>);
   }
 };

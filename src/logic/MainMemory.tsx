@@ -1,4 +1,5 @@
 import React from 'react';
+import MemoryCell, { MemoryUse } from '../utils/MemoryCell';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
@@ -12,12 +13,20 @@ export class MainMemory extends LogicComponent
   public dout: Output;
   public readonly addrbits: number;
   public readonly databits: number;
+  public readonly length: number;
+  #cells: Array<MemoryCell>;
 
   constructor(id: string, x: number, y: number, params: any)
   {
     super("MainMemory", id, x, y);
     this.addrbits = params.addrbits;
     this.databits = params.databits;
+    this.length = 1 << this.addrbits;
+    this.#cells = [];
+    for (let i = 0; i < this.length; i++)
+    {
+      this.#cells.push(new MemoryCell(`Memory Cell #{i}`));
+    }
 
     this.addr = new Input('addr', -20, params.addrY || 0);
     this.memr = new Input('memr', -20, params.memrY || 0);
@@ -28,8 +37,26 @@ export class MainMemory extends LogicComponent
 
   public eval()
   {
-    // TODO: Anything.
     this.dout.clear();
+    const addr = this.addr.asInteger;
+    if (addr === undefined) return;
+    if (addr >= this.length || addr < 0)
+    {
+      throw new Error('there is no memory cell at address ' + addr);
+    }
+    let usage: MemoryUse = 'none';
+    if (this.memr.asBoolean === true)
+    {
+      if (this.memw.asBoolean === true) return;
+      usage = 'read';
+      this.dout.value = this.#cells[addr].value;
+    }
+    else if (this.memw.asBoolean === true)
+    {
+      usage = 'write';
+      this.#cells[addr].value = this.din.value;
+    }
+    this.#cells[addr].lastUse = usage;
   }
 
   public render(k: string, d: Datapath)

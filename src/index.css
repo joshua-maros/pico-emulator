@@ -68,6 +68,22 @@ code {
   stroke-width: 1px;
 }
 
+.datapath .use_read {
+  fill: var(--read-bg);
+}
+
+.datapath .use_write {
+  fill: var(--write-bg);
+}
+
+.datapath .use_write {
+  fill: var(--write-bg);
+}
+
+.datapath .use_write {
+  fill: var(--write-bg);
+}
+
 .datapath .label {
   fill: #000;
   stroke: none;
