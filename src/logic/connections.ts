@@ -118,7 +118,7 @@ export class Bus
   // Connects a component's input such that its value is provided by this bus.
   public connectInput(c: LogicComponent, input: Input)
   {
-    input.setConnection(this, c);
+    input.setConnection(this);
     this.connectedInputPins.push({ c, p: input });
   }
 

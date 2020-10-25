@@ -5,7 +5,6 @@ export class Input
 {
   // This should return the value of what the input is connected to when called.
   #connection: Bus | undefined;
-  #parent: LogicComponent | undefined;
 
   constructor(
     public name: string,
@@ -23,10 +22,9 @@ export class Input
   }
 
   // Set the connection of this input 
-  setConnection(connection: Bus, parent: LogicComponent)
+  setConnection(connection: Bus)
   {
     this.#connection = connection;
-    this.#parent = parent;
   }
 
   // Returns the value being fed into this input. Returns undefined i this input is not being fed

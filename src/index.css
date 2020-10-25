@@ -133,7 +133,7 @@ code {
   stroke-width: 2.5px;
 }
 
-.datapath .wire.active.used {
+.datapath .wire.active .used {
   stroke: #000;
   stroke-width: 3px;
 }

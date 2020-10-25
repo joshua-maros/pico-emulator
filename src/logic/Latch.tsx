@@ -58,7 +58,8 @@ export class Latch extends LogicComponent
         }
       }
       this.data.lastUse = 'write';
-    } else if (this.data.value !== undefined)
+    } 
+    else if (this.data.value !== undefined && this.out.used)
     {
       this.data.lastUse = 'read';
     }

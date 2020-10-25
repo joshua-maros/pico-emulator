@@ -1,10 +1,13 @@
 import React from 'react';
+import { Pathfinder } from '../utils/djikstra';
+import { Input, Output } from './component';
 import { Bus, BusException } from './connections';
 import { Datapath } from './datapath';
 
 export class Wire
 {
   segments: Array<WireSegment>;
+  segmentPathfind: Pathfinder;
 
   // Ins and outs arrays are for debugging only.
   constructor(public readonly bus: Bus, pathDescription: string, ins: Array<string>, outs: Array<string>)
@@ -12,6 +15,60 @@ export class Wire
     const builder = new SegmentsBuilder(bus, ins, outs);
     builder.parse(pathDescription);
     this.segments = builder.segments;
+    this.segmentPathfind = new Pathfinder(this.segments.length);
+    // Make connections between all lines that share end points.
+    for (let source = 0; source < this.segments.length; source++)
+    {
+      const sl = this.segments[source];
+      for (let target = 0; target < this.segments.length; target++)
+      {
+        const tl = this.segments[target];
+        const touching = (sl.x1 === tl.x1 && sl.y1 === tl.y1)
+          || (sl.x1 === tl.x2 && sl.y1 === tl.y2)
+          || (sl.x2 === tl.x1 && sl.y2 === tl.y1)
+          || (sl.x2 === tl.x2 && sl.y2 === tl.y2);
+        if (touching)
+        {
+          this.segmentPathfind.addBidirectionalConnection(source, target);
+        }
+      }
+    }
+  }
+
+  public segmentIndexConnectedAt(connection: Input | Output): number
+  {
+    let px = connection.x, py = connection.y;
+    // Add the coordinate of the parent component to the coordinate of the connection.
+    for (const ip of this.bus.connectedInputPins)
+    {
+      if (connection === ip.p)
+      {
+        px += ip.c.x;
+        py += ip.c.y;
+        break;
+      }
+    }
+    for (const op of this.bus.connectedOutputPins)
+    {
+      if (connection === op.p)
+      {
+        px += op.c.x;
+        py += op.c.y;
+        break;
+      }
+    }
+    // Find a segment which has a point attached to the connection.
+    const index = this.segments.findIndex(segment =>
+    {
+      return (segment.x1 === px && segment.y1 === py)
+        || (segment.x2 === px && segment.y2 === py);
+    });
+    if (index === -1)
+    {
+      console.log(px, py, this.segments);
+      throw new Error('Wire is not properly connected to component at ' + connection.name);
+    }
+    return index;
   }
 
   public render(k: string, d: Datapath)
@@ -276,29 +333,45 @@ class WireView extends React.Component<{ c: Wire, d: Datapath }>
 {
   render()
   {
-    const busValue = this.props.c.bus.displayValue;
+    const c = this.props.c;
+    const bus = c.bus;
+    const busValue = bus.displayValue;
     let className = 'active';
     if (busValue === BusException.Inactive)
     {
       className = 'inactive';
-    } 
+    }
     else if (busValue === BusException.Conflict)
     {
       className = 'conflict';
-    } 
+    }
     else if (busValue === '0' || busValue === 'false')
     {
       className += ' low';
     }
-    if (this.props.c.bus.used)
-    {
-      className += ' used';
-    }
     className += ' wire';
+
+    let segmentsAreUsed: Array<boolean> = new Array(c.segments.length).fill(false);
+    if (bus.used && bus.activeInput !== undefined)
+    {
+      const inputSegment = c.segmentIndexConnectedAt(bus.activeInput);
+      c.segmentPathfind.setTarget(inputSegment);
+      for (const output of bus.usedBy)
+      {
+        const startingPoint = c.segmentIndexConnectedAt(output);
+        const path = c.segmentPathfind.findRoute(startingPoint);
+        for (const step of path)
+        {
+          segmentsAreUsed[step] = true;
+        }
+      }
+    }
+
     let segments = [], i = 0;
     for (const seg of this.props.c.segments)
     {
-      segments.push(<line key={i} {...seg}></line>);
+      const className = segmentsAreUsed[i] ? 'used' : '';
+      segments.push(<line key={i} className={className} {...seg}></line>);
       i++;
     }
     return (
