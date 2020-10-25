@@ -41,6 +41,7 @@ export class Expand extends LogicComponent
       }
     }
     this.out.asInteger = outValue;
+    this.in.used = this.out.used;
   }
 
   public render(k: string, d: Datapath)

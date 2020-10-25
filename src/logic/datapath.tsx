@@ -152,13 +152,22 @@ export class Datapath
   public eval()
   {
     // This is a hacky way to make sure changes propogate through the whole circuit.
-    for (let i = 0; i < 10; i++)
+    const doWork = (iters: number) =>
     {
-      for (let c of this.#components)
+      for (let i = 0; i < iters; i++)
       {
-        c.eval();
+        for (let c of this.#components)
+        {
+          c.eval();
+        }
       }
+    };
+    doWork(5);
+    for (const b of this.#buses)
+    {
+      b.clearUsedBy();
     }
+    doWork(10);
     this.changeListener();
   }
 

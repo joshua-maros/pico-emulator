@@ -31,6 +31,8 @@ export class Latch extends LogicComponent
   public eval()
   {
     this.out.value = this.data.value;
+    this.in.used = this.load.asBoolean === true;
+    this.load.used = this.load.asBoolean === true;
   }
 
   public evalClock()
@@ -56,7 +58,8 @@ export class Latch extends LogicComponent
         }
       }
       this.data.lastUse = 'write';
-    } else if (this.data.value !== undefined) {
+    } else if (this.data.value !== undefined)
+    {
       this.data.lastUse = 'read';
     }
   }

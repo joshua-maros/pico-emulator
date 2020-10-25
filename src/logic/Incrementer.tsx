@@ -28,6 +28,7 @@ export class Incrementer extends LogicComponent
     }
     value = asUnsignedBits(value, this.nbits) + this.constant;
     this.out.asInteger = asUnsignedBits(value, this.nbits);
+    this.in.used = this.out.used;
   }
 
   public render(k: string, d: Datapath)

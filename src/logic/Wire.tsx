@@ -23,10 +23,10 @@ export class Wire
 class WireSegment
 {
   constructor(
-    public x1: number,
-    public y1: number,
-    public x2: number,
-    public y2: number,
+    public readonly x1: number,
+    public readonly y1: number,
+    public readonly x2: number,
+    public readonly y2: number,
   ) { }
 }
 
@@ -66,8 +66,8 @@ class SegmentsBuilder
 
   private outputToInput(path: string)
   {
-    const { x: x1, y: y1 } = this.getOutputPin(0);
-    const { x: x2, y: y2 } = this.getInputPin(0);
+    const { x: x1, y: y1 } = this.getInputPin(0);
+    const { x: x2, y: y2 } = this.getOutputPin(0);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     switch (path)
@@ -281,12 +281,18 @@ class WireView extends React.Component<{ c: Wire, d: Datapath }>
     if (busValue === BusException.Inactive)
     {
       className = 'inactive';
-    } else if (busValue === BusException.Conflict)
+    } 
+    else if (busValue === BusException.Conflict)
     {
       className = 'conflict';
-    } else if (busValue === '0' || busValue === 'false')
+    } 
+    else if (busValue === '0' || busValue === 'false')
     {
       className += ' low';
+    }
+    if (this.props.c.bus.used)
+    {
+      className += ' used';
     }
     className += ' wire';
     let segments = [], i = 0;

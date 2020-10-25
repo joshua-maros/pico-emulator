@@ -23,10 +23,12 @@ export class Tristate extends LogicComponent
   {
     if (this.enable.asBoolean === true)
     {
+      this.enable.used = true;
       let value = this.in.value;
       if (value !== undefined)
       {
         this.out.value = value;
+        this.in.used = this.out.used;
         return;
       }
     }

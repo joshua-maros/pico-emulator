@@ -99,6 +99,7 @@ export class FlagLogic extends LogicComponent
         break;
       case 'ROT':
         val = this.flagC;
+        this.in.used = true;
         break;
       case 'LDZ':
       case 'LDALL':
@@ -106,6 +107,7 @@ export class FlagLogic extends LogicComponent
       case 'CLC':
       case 'STC':
       case 'CMC':
+        this.in.used = true;
         break;
       default:
         throw new Error('Evaluating DPFlagLogic ' + this.id + ': Op input has unknown value ' + op);

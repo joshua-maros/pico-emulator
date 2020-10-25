@@ -24,6 +24,8 @@ export class And extends LogicComponent
     else
     {
       this.out.asBoolean = a && b;
+      this.in0.used = this.out.used && a && b;
+      this.in1.used = this.out.used && a && b;
     }
   }
 
@@ -68,6 +70,8 @@ export class Or extends LogicComponent
     else
     {
       this.out.asBoolean = a || b;
+      this.in0.used = this.out.used && a;
+      this.in1.used = this.out.used && b;
     }
   }
 
@@ -117,6 +121,12 @@ export class AndOr extends LogicComponent
     else
     {
       this.out.asBoolean = false;
+    }
+    if (a !== undefined) this.in0.used = this.out.used && a;
+    if ((b !== undefined) && (c !== undefined)) 
+    {
+      this.in1.used = this.out.used && b && c;
+      this.in2.used = this.out.used && b && c;
     }
   }
 

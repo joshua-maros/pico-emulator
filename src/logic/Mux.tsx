@@ -32,10 +32,12 @@ export class Mux extends LogicComponent
     if (sel)
     {
       this.out.value = this.in1.value;
+      this.in1.used = this.out.used;
     }
     else
     {
       this.out.value = this.in0.value;
+      this.in0.used = this.out.used;
     }
   }
 

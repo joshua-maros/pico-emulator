@@ -50,11 +50,16 @@ export class MainMemory extends LogicComponent
       if (this.memw.asBoolean === true) return;
       usage = 'read';
       this.dout.value = this.#cells[addr].value;
+      this.addr.used = true;
+      this.memr.used = true;
     }
     else if (this.memw.asBoolean === true)
     {
       usage = 'write';
       this.#cells[addr].value = this.din.value;
+      this.addr.used = true;
+      this.din.used = true;
+      this.memw.used = true;
     }
     this.#cells[addr].lastUse = usage;
   }

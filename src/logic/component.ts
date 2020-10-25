@@ -3,10 +3,9 @@ import { Datapath } from "./datapath";
 
 export class Input
 {
-  // This should return the value of what the input is connected to when called. Return undefined
-  // if there is no valid value being fed into this input. When an input is created this function 
-  // will always return undefined until replaced by an actual connection.
-  #connection: () => string | undefined = () => undefined;
+  // This should return the value of what the input is connected to when called.
+  #connection: Bus | undefined;
+  #parent: LogicComponent | undefined;
 
   constructor(
     public name: string,
@@ -14,18 +13,34 @@ export class Input
     public y: number,
   ) { }
 
-  // Set the connection of this input by providing a function which, when called, returns the value
-  // that is being fed into this input.
-  set connection(connection: () => string | undefined)
+  // Mark that the value from this input has been used for something.
+  public set used(used: boolean)
+  {
+    if (used && this.#connection !== undefined)
+    {
+      this.#connection.markUsedBy(this);
+    }
+  }
+
+  // Set the connection of this input 
+  setConnection(connection: Bus, parent: LogicComponent)
   {
     this.#connection = connection;
+    this.#parent = parent;
   }
 
   // Returns the value being fed into this input. Returns undefined i this input is not being fed
   // a value.
   get value(): string | undefined
   {
-    return this.#connection();
+    if (this.#connection === undefined)
+    {
+      return undefined;
+    }
+    else
+    {
+      return this.#connection.value;
+    }
   }
 
   // Returns the value being fed into this input as a boolean. Throws an error if this input is 
@@ -74,12 +89,23 @@ export class Output
 {
   // The value that is being outputted. Undefined if we are not outputting anything.
   #value: string | undefined = undefined;
+  #connection: Bus | undefined;
 
   constructor(
     public name: string,
     public x: number,
     public y: number,
   ) { }
+
+  set connection(connection: Bus)
+  {
+    this.#connection = connection;
+  }
+
+  public get used(): boolean
+  {
+    return this.#connection?.used || false;
+  }
 
   // Returns the value this output is currently outputting, undefined if nothing is being outputted.
   get value(): string | undefined
