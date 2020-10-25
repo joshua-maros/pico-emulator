@@ -13,19 +13,6 @@
   column-gap: 2em;
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-column-gap: 0.5em;
-  column-gap: 0.5em;
-  grid-row-gap: 0.5em;
-  row-gap: 0.5em;
-}
-
-.actions button {
-  white-space: nowrap;
-}
-
 /* https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/ */
 .semi_hidden {
   width: 0.1px;
@@ -58,21 +45,4 @@
   height: min-content;
   margin-top: auto;
   margin-bottom: auto;
-}
-
-.info_message {
-  padding: 0.5em;
-  color: var(--info-text);
-  background: var(--info-text-bg);
-}
-
-.error_message {
-  padding: 0.5em;
-  color: var(--error-text);
-  background: var(--error-text-bg);
-}
-
-.switch_view_button {
-  grid-column: 4;
-  grid-column-end: 6;
 }

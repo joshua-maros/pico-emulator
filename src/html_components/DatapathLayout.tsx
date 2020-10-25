@@ -18,20 +18,7 @@ export default class DatapathLayout extends React.Component<Props, State> {
   {
     const datapath = this.props.datapath;
     return (
-      <div className={style.root}>
-        <DatapathView className={style.datapathView} datapath={datapath} />
-        <div className={style.actions}>
-          <button className="flat-button" onClick={() => { datapath.clock(); datapath.eval(); }}>Clock</button>
-          <button className="flat-button" onClick={() => {}}>Run</button>
-          <button className="flat-button" onClick={() => {}}>Run Fast</button>
-          <button className="flat-button" onClick={() => {}}>Stop</button>
-          <button className="flat-button" onClick={() => { datapath.reset(); datapath.eval(); }}>Reset</button>
-          {/* <button className="flat-button" onClick={saveFile}>Save Memory</button>
-          <label className="flat-button" htmlFor="file">Load Memory</label>
-          <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} /> */}
-          <button className={'flat-button ' + style.switch_view_button}>Switch To Datapath View</button>
-        </div>
-      </div>
+      <DatapathView className={style.datapathView} datapath={datapath} />
     )
   }
 }

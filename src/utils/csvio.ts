@@ -1,5 +1,4 @@
 import { MemoryCell } from "./memory_cells";
-import PicoMemory from "./PicoMemory";
 
 
 function saveMem(mem: Array<MemoryCell>): string

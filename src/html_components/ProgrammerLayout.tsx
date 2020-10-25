@@ -6,7 +6,6 @@ import MemoryGrid from './MemoryGrid';
 import style from './ProgrammerLayout.module.css';
 import MemoryCellView from './MemoryCellView';
 import FlagCellView from './FlagCellView';
-import csvio from '../utils/csvio';
 import { Datapath } from '../logic/datapath';
 import { MemoryCell } from '../utils/memory_cells';
 
@@ -49,16 +48,6 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
         )
       }
     }
-  }
-
-  componentDidMount()
-  {
-    this.props.datapath.changeListener = () => this.forceUpdate();
-  }
-
-  componentWillUnmount()
-  {
-    this.props.datapath.changeListener = () => { };
   }
 
   selectTextBox()
@@ -136,34 +125,6 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       }
     }
 
-    const loadFile = (event: React.ChangeEvent<HTMLInputElement>) =>
-    {
-      let file = event.target.files?.item(0);
-      if (!file) return;
-      file.text().then((text: string) =>
-      {
-        let error = csvio.loadMem(datapath.mainMemoryBlock, text);
-        this.forceUpdate();
-        if (error)
-        {
-          alert('Error encountered while loading file:\n' + error);
-        }
-      });
-    };
-
-    const saveFile = () => 
-    {
-      let contents = csvio.saveMem(datapath.mainMemoryBlock);
-      let blob = new Blob([contents]);
-      let href = URL.createObjectURL(blob);
-      let link = document.createElement('a');
-      link.download = 'Memory.csv';
-      link.type = 'text/csv';
-      link.href = href;
-      link.click();
-      link.remove();
-    };
-
     let sidebarItems = [];
     for (const reg of datapath.visibleRegisters)
     {
@@ -189,57 +150,41 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     }
 
     return (
-      <div className={style.root}>
-        <div className={style.processor}>
-          <div className={style.left_controls}>
-            {sidebarItems}
+      <div className={style.processor}>
+        <div className={style.left_controls}>
+          {sidebarItems}
 
-            <div />
-            <div style={{ height: '2em' }} />
+          <div />
+          <div style={{ height: '2em' }} />
 
-            <div className={style.label}>Selected:</div>
-            <div>{editingLabel}</div>
-            <div className={style.label}>Value:</div>
-            <input
-              ref={this.textBoxRef}
-              value={this.state.editing.cell.value}
-              onChange={changeValue}
-              onKeyUp={inputKeyUp}
-            />
-
-            <div />
-            <button
-              className="flat-button"
-              onClick={() => this.shiftMemoryUp(this.state.editing.memoryIndex || 0)}
-              disabled={!isEditingMemory}
-            >Shift Up</button>
-            <div />
-            <button
-              className="flat-button"
-              onClick={() => this.shiftMemoryDown(this.state.editing.memoryIndex || 0)}
-              disabled={!isEditingMemory}
-            >Shift Down</button>
-          </div>
-          <MemoryGrid
-            memoryBlock={datapath.mainMemoryBlock}
-            onClick={index => this.state.focusCell(datapath.mainMemoryBlock[index], index)}
-            focusedIndex={this.state.editing.memoryIndex}
+          <div className={style.label}>Selected:</div>
+          <div>{editingLabel}</div>
+          <div className={style.label}>Value:</div>
+          <input
+            ref={this.textBoxRef}
+            value={this.state.editing.cell.value}
+            onChange={changeValue}
+            onKeyUp={inputKeyUp}
           />
+
+          <div />
+          <button
+            className="flat-button"
+            onClick={() => this.shiftMemoryUp(this.state.editing.memoryIndex || 0)}
+            disabled={!isEditingMemory}
+          >Shift Up</button>
+          <div />
+          <button
+            className="flat-button"
+            onClick={() => this.shiftMemoryDown(this.state.editing.memoryIndex || 0)}
+            disabled={!isEditingMemory}
+          >Shift Down</button>
         </div>
-        <div className={datapath.lastMessageWasError ? style.error_message : style.info_message}>
-          {datapath.lastMessage}
-        </div>
-        <div className={style.actions}>
-          <button className="flat-button" onClick={() => datapath.clock()}>Step</button>
-          <button className="flat-button" onClick={() => datapath.startRunning(false)}>Run</button>
-          <button className="flat-button" onClick={() => datapath.startRunning(true)}>Run Fast</button>
-          <button className="flat-button" onClick={() => datapath.halt()}>Stop</button>
-          <button className="flat-button" onClick={() => datapath.reset()}>Reset</button>
-          <button className="flat-button" onClick={saveFile}>Save Memory</button>
-          <label className="flat-button" htmlFor="file">Load Memory</label>
-          <input onChange={loadFile} id="file" type="file" accept=".csv" className={style.semi_hidden} />
-          <button className={'flat-button ' + style.switch_view_button}>Switch To Datapath View</button>
-        </div>
+        <MemoryGrid
+          memoryBlock={datapath.mainMemoryBlock}
+          onClick={index => this.state.focusCell(datapath.mainMemoryBlock[index], index)}
+          focusedIndex={this.state.editing.memoryIndex}
+        />
       </div>
     )
   }

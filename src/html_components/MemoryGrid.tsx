@@ -3,7 +3,6 @@
 import React from 'react';
 import MemoryCellView from './MemoryCellView';
 import style from './MemoryGrid.module.css';
-import PicoMemory from '../utils/PicoMemory';
 import { MemoryCell } from '../utils/memory_cells';
 
 type Props = {

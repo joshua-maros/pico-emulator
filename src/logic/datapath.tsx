@@ -199,6 +199,13 @@ export class Datapath
     }
   }
 
+  // Does a clock and evals afterwards.
+  public step()
+  {
+    this.clock();
+    this.eval();
+  }
+
   startRunning(fast: boolean)
   {
     this.#fast = fast;
