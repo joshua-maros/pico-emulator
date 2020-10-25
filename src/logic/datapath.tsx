@@ -1,4 +1,5 @@
 import React from 'react';
+import { FlagCell, MemoryCell } from '../utils/memory_cells';
 import { ALU } from './ALU';
 import { LogicComponent } from "./component";
 import { Bus } from "./connections";
@@ -31,21 +32,21 @@ export interface DatapathDef
   }>
 }
 
-type ComponentMaker = (id: string, x: number, y: number, params: Map<string, any>) => LogicComponent;
+type ComponentMaker = (d: Datapath, id: string, x: number, y: number, params: Map<string, any>) => LogicComponent;
 const componentTypes: Map<string, ComponentMaker> = new Map([
-  ["ALU", (i, x, y, p): LogicComponent => new ALU(i, x, y, p)],
-  ["And", (i, x, y, p): LogicComponent => new And(i, x, y, p)],
-  ["AndOr", (i, x, y, p): LogicComponent => new AndOr(i, x, y, p)],
-  ["Control", (i, x, y, p): LogicComponent => new Control(i, x, y, p)],
-  ["Expand", (i, x, y, p): LogicComponent => new Expand(i, x, y, p)],
-  ["FlagLogic", (i, x, y, p): LogicComponent => new FlagLogic(i, x, y, p)],
-  ["Incrementer", (i, x, y, p): LogicComponent => new Incrementer(i, x, y, p)],
-  ["Latch", (i, x, y, p): LogicComponent => new Latch(i, x, y, p)],
-  ["MainMemory", (i, x, y, p): LogicComponent => new MainMemory(i, x, y, p)],
-  ["Mux", (i, x, y, p): LogicComponent => new Mux(i, x, y, p)],
-  ["Or", (i, x, y, p): LogicComponent => new Or(i, x, y, p)],
-  ["Probe", (i, x, y, p): LogicComponent => new Probe(i, x, y, p)],
-  ["Tristate", (i, x, y, p): LogicComponent => new Tristate(i, x, y, p)],
+  ["ALU", (d, i, x, y, p): LogicComponent => new ALU(d, i, x, y, p)],
+  ["And", (d, i, x, y, p): LogicComponent => new And(d, i, x, y, p)],
+  ["AndOr", (d, i, x, y, p): LogicComponent => new AndOr(d, i, x, y, p)],
+  ["Control", (d, i, x, y, p): LogicComponent => new Control(d, i, x, y, p)],
+  ["Expand", (d, i, x, y, p): LogicComponent => new Expand(d, i, x, y, p)],
+  ["FlagLogic", (d, i, x, y, p): LogicComponent => new FlagLogic(d, i, x, y, p)],
+  ["Incrementer", (d, i, x, y, p): LogicComponent => new Incrementer(d, i, x, y, p)],
+  ["Latch", (d, i, x, y, p): LogicComponent => new Latch(d, i, x, y, p)],
+  ["MainMemory", (d, i, x, y, p): LogicComponent => new MainMemory(d, i, x, y, p)],
+  ["Mux", (d, i, x, y, p): LogicComponent => new Mux(d, i, x, y, p)],
+  ["Or", (d, i, x, y, p): LogicComponent => new Or(d, i, x, y, p)],
+  ["Probe", (d, i, x, y, p): LogicComponent => new Probe(d, i, x, y, p)],
+  ["Tristate", (d, i, x, y, p): LogicComponent => new Tristate(d, i, x, y, p)],
 ]);
 
 export class Datapath
@@ -54,8 +55,20 @@ export class Datapath
   #wires: Array<Wire> = [];
   #buses: Array<Bus> = [];
   changeListener: () => void = () => { };
+
   public width: number = 800;
   public height: number = 600;
+  public visibleFlags: Array<FlagCell> = [];
+  public visibleRegisters: Array<MemoryCell> = [];
+  public mainMemoryBlock: Array<MemoryCell> = [];
+  public controls: Array<Control> = [];
+
+  // Are we 'running' the code for a processor?
+  #running = false;
+  // Are we running fast or slow?
+  #fast = false;
+  // The timer used while running
+  #timer: number | undefined = undefined;
 
   get components(): Array<LogicComponent>
   {
@@ -79,7 +92,11 @@ export class Datapath
       {
         throw new Error(`Emulator error: '${cdef.type}' is not a valid component type.`);
       }
-      let component = builder(cdef.id, cdef.x, cdef.y, cdef);
+      let component = builder(this, cdef.id, cdef.x, cdef.y, cdef);
+      if (component instanceof Control)
+      {
+        this.controls.push(component);
+      }
       this.#components.push(component);
     }
     const findComp = (id: string) => this.#components.find(i => i.id === id);
@@ -179,11 +196,43 @@ export class Datapath
       c.evalClock();
     }
   }
+
+  startRunning(fast: boolean)
+  {
+    this.#fast = fast;
+    if (this.#running === false)
+    {
+      this.#running = true;
+      this.timerTick();
+    }
+  }
+
+  // Stop the current 'run' of the processor
+  halt()
+  {
+    if (this.#running) {
+      clearTimeout(this.#timer);
+      this.#running = false;
+    }
+  }
+
+  private timerTick()
+  {
+    clearTimeout(this.#timer);
+    this.#timer = undefined;
+    this.clock();
+    this.eval();
+    if (this.#running)
+    {
+      let speed = this.#fast ? 200 : 2000;
+      this.#timer = window.setTimeout(() => this.timerTick(), speed);
+    }
+  }
 }
 
-export class DatapathView extends React.Component<{ datapath: Datapath }>
+export class DatapathView extends React.Component<{ datapath: Datapath, className: string }>
 {
-  constructor(props: { datapath: Datapath })
+  constructor(props: { datapath: Datapath, className: string })
   {
     super(props);
     props.datapath.changeListener = () => this.forceUpdate();
@@ -205,7 +254,7 @@ export class DatapathView extends React.Component<{ datapath: Datapath }>
     }
     let { width, height } = this.props.datapath;
 
-    return (<svg className="datapath" width={width} height={height}>
+    return (<svg className={"datapath " + this.props.className} viewBox={`0 0 ${width} ${height}`}>
       {children}
     </svg>);
   }

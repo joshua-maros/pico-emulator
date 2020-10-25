@@ -11,9 +11,9 @@ export class Incrementer extends LogicComponent
   public readonly nbits: number;
   public readonly constant: number;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Incrementer", id, x, y);
+    super(d, "Incrementer", id, x, y);
     this.nbits = params.nbits;
     this.constant = params.constant;
   }

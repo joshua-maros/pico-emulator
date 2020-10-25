@@ -19,7 +19,7 @@ export default class DatapathLayout extends React.Component<Props, State> {
     const datapath = this.props.datapath;
     return (
       <div className={style.root}>
-        <DatapathView datapath={datapath} />
+        <DatapathView className={style.datapathView} datapath={datapath} />
         <div className={style.actions}>
           <button className="flat-button" onClick={() => { datapath.clock(); datapath.eval(); }}>Clock</button>
           <button className="flat-button" onClick={() => {}}>Run</button>

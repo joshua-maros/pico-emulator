@@ -1,5 +1,5 @@
 import React from 'react';
-import MemoryCell from '../utils/MemoryCell';
+import { MemoryCell } from '../utils/memory_cells';
 import { asUnsignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
@@ -15,9 +15,9 @@ export class Latch extends LogicComponent
   public readonly nbits: number | undefined;
   public data: MemoryCell;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Latch", id, x, y);
+    super(d, "Latch", id, x, y);
     this.name = params.name || "Unnamed";
     this.data = new MemoryCell(this.name);
     this.resetValue = params.resetValue;
@@ -26,6 +26,10 @@ export class Latch extends LogicComponent
       this.resetValue = '' + this.resetValue;
     }
     this.nbits = params.nbits;
+    if (params.visible === true)
+    {
+      d.visibleRegisters.push(this.data);
+    }
   }
 
   public eval()
@@ -58,7 +62,7 @@ export class Latch extends LogicComponent
         }
       }
       this.data.lastUse = 'write';
-    } 
+    }
     else if (this.data.value !== undefined && this.out.used)
     {
       this.data.lastUse = 'read';

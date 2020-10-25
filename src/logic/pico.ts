@@ -12,7 +12,7 @@ const x3 = x0 + 40;
 const y3 = y0 + 260;
 
 export const PICO: DatapathDef = {
-  width: 1100,
+  width: 770,
   height: 550,
   components: [
     {

@@ -10,9 +10,9 @@ export class Tristate extends LogicComponent
   public out: Output;
   public readonly flip: boolean;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Tristate", id, x, y);
+    super(d, "Tristate", id, x, y);
     let f = params.flip === true;
     this.flip = f;
     this.in = new Input('in', f ? 30 : 0, 20);

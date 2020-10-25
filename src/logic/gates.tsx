@@ -9,9 +9,9 @@ export class And extends LogicComponent
   public in1 = new Input('in1', 0, 15);
   public out = new Output('out', 20, 10);
 
-  constructor(id: string, x: number, y: number, _params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, _params: any)
   {
-    super("And", id, x, y);
+    super(d, "And", id, x, y);
   }
 
   public eval()
@@ -55,9 +55,9 @@ export class Or extends LogicComponent
   public in1 = new Input('in1', 0, 15);
   public out = new Output('out', 20, 10);
 
-  constructor(id: string, x: number, y: number, _params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, _params: any)
   {
-    super("Or", id, x, y);
+    super(d, "Or", id, x, y);
   }
 
   public eval()
@@ -102,9 +102,9 @@ export class AndOr extends LogicComponent
   public in2 = new Input('in2', 0, 25);
   public out = new Output('out', 40, 10);
 
-  constructor(id: string, x: number, y: number, _params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, _params: any)
   {
-    super("AndOr", id, x, y);
+    super(d, "AndOr", id, x, y);
   }
 
   public eval()

@@ -1,5 +1,5 @@
 import React from 'react';
-import MemoryCell, { MemoryUse } from '../utils/MemoryCell';
+import { MemoryCell, CellUse } from '../utils/memory_cells';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
@@ -16,9 +16,9 @@ export class MainMemory extends LogicComponent
   public readonly length: number;
   #cells: Array<MemoryCell>;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("MainMemory", id, x, y);
+    super(d, "MainMemory", id, x, y);
     this.addrbits = params.addrbits;
     this.databits = params.databits;
     this.length = 1 << this.addrbits;
@@ -27,6 +27,7 @@ export class MainMemory extends LogicComponent
     {
       this.#cells.push(new MemoryCell(`Memory Cell #{i}`));
     }
+    d.mainMemoryBlock = this.#cells;
 
     this.addr = new Input('addr', -20, params.addrY || 0);
     this.memr = new Input('memr', -20, params.memrY || 0);
@@ -44,7 +45,7 @@ export class MainMemory extends LogicComponent
     {
       throw new Error('there is no memory cell at address ' + addr);
     }
-    let usage: MemoryUse = 'none';
+    let usage: CellUse = 'none';
     if (this.memr.asBoolean === true)
     {
       if (this.memw.asBoolean === true) return;

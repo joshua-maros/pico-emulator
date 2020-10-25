@@ -1,9 +1,14 @@
 .root {
   display: grid;
-  max-width: 50em;
+  max-width: 60em;
   margin: auto;
   grid-row-gap: 1em;
   row-gap: 1em;
+}
+
+.datapathView {
+  width: 100%;
+  min-width: 0;
 }
 
 .actions {

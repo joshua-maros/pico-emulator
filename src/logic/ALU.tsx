@@ -14,9 +14,9 @@ export class ALU extends LogicComponent
   public flags = new Output('flags', 20, 10);
   private readonly nBits: number;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("ALU", id, x, y);
+    super(d, "ALU", id, x, y);
     this.nBits = params.nbits;
   }
 

@@ -13,9 +13,9 @@ export class Mux extends LogicComponent
   public readonly outNBits: number;
   public readonly extend: boolean;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Mux", id, x, y);
+    super(d, "Mux", id, x, y);
     this.inNBits = params.inNBits;
     this.outNBits = params.outNBits;
     this.extend = params.extend === true;

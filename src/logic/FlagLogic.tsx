@@ -1,4 +1,5 @@
 import React from 'react';
+import { FlagCell } from '../utils/memory_cells';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
@@ -48,15 +49,18 @@ export class FlagLogic extends LogicComponent
   public in = new Input('in', 30, 30);
   public op = new Input('op', 0, 15);
   public out = new Output('out', 30, 0);
-  public flagN: boolean | undefined = undefined;
-  public flagZ: boolean | undefined = undefined;
-  public flagC: boolean | undefined = undefined;
-  public flagV: boolean | undefined = undefined;
-  public flagTZ: boolean | undefined = undefined;
+  public flagN = new FlagCell('NEG');
+  public flagZ = new FlagCell('ZERO');
+  public flagC = new FlagCell('CARRY');
+  public flagV = new FlagCell('V');
+  public flagTZ = new FlagCell('TZ');
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("FlagLogic", id, x, y);
+    super(d, "FlagLogic", id, x, y);
+    d.visibleFlags.push(this.flagC);
+    d.visibleFlags.push(this.flagZ);
+    d.visibleFlags.push(this.flagN);
   }
 
   public eval()
@@ -71,34 +75,34 @@ export class FlagLogic extends LogicComponent
     switch (op)
     {
       case 'RDTZ':
-        val = this.flagTZ;
+        val = this.flagTZ.value;
         break;
       case 'RDC':
-        val = this.flagC;
+        val = this.flagC.value;
         break;
       case 'RDZ':
-        val = this.flagZ;
+        val = this.flagZ.value;
         break;
       case 'RDN':
-        val = this.flagN;
+        val = this.flagN.value;
         break;
       case 'RDV':
-        val = this.flagV;
+        val = this.flagV.value;
         break;
       case 'RDNC':
-        val = maybeNot(this.flagC);
+        val = maybeNot(this.flagC.value);
         break;
       case 'RDNZ':
-        val = maybeNot(this.flagZ);
+        val = maybeNot(this.flagZ.value);
         break;
       case 'RDNN':
-        val = maybeNot(this.flagN);
+        val = maybeNot(this.flagN.value);
         break;
       case 'RDNV':
-        val = maybeNot(this.flagV);
+        val = maybeNot(this.flagV.value);
         break;
       case 'ROT':
-        val = this.flagC;
+        val = this.flagC.value;
         this.in.used = true;
         break;
       case 'LDZ':
@@ -137,30 +141,30 @@ export class FlagLogic extends LogicComponent
       case 'RDNV':
         return;
       case 'ROT':
-        this.flagC = maybeBit(inval, 1);
+        this.flagC.value = maybeBit(inval, 1);
         break;
       case 'LDZ':
-        this.flagZ = maybeBit(inval, 1);
+        this.flagZ.value = maybeBit(inval, 1);
         break;
       case 'LDALL':
-        this.flagN = maybeBit(inval, 0);
-        this.flagZ = maybeBit(inval, 1);
-        this.flagC = maybeBit(inval, 2);
-        this.flagV = maybeBit(inval, 3);
+        this.flagN.value = maybeBit(inval, 0);
+        this.flagZ.value = maybeBit(inval, 1);
+        this.flagC.value = maybeBit(inval, 2);
+        this.flagV.value = maybeBit(inval, 3);
         break;
       case 'LDTZ':
-        this.flagZ = maybeBit(inval, 1);
-        break;
-      case 'CLC':
-        this.flagC = false;
-        break;
-      case 'STC':
-        this.flagC = true;
-        break;
-      case 'CMC':
-        this.flagC = maybeNot(this.flagC);
-        break;
-      default:
+        this.flagZ.value = maybeBit(inval, 1);
+        break;    
+      case 'CLC': 
+        this.flagC.value = false;
+        break;    
+      case 'STC': 
+        this.flagC.value = true;
+        break;    
+      case 'CMC': 
+        this.flagC.value = maybeNot(this.flagC.value);
+        break;                                
+      default:                                
         throw new Error('Evaluating DPFlagLogic ' + this.id + ': Op input has unknown value ' + op);
     }
   }
@@ -184,11 +188,11 @@ class FlagLogicView extends React.Component<{ c: FlagLogic, d: Datapath }>
       + ' ' + bitName(maybeBit(i, 2))
       + ' ' + bitName(maybeBit(i, 1))
       + ' ' + bitName(maybeBit(i, 0));
-    const outStr = bitName(c.flagTZ)
-      + ' ' + bitName(c.flagV)
-      + ' ' + bitName(c.flagC)
-      + ' ' + bitName(c.flagZ)
-      + ' ' + bitName(c.flagN);
+    const outStr = bitName(c.flagTZ.value)
+      + ' ' + bitName(c.flagV.value)     
+      + ' ' + bitName(c.flagC.value)     
+      + ' ' + bitName(c.flagZ.value)     
+      + ' ' + bitName(c.flagN.value);
     return (
       <g transform={xfrm} className="component">
         <path d='M0 0 H 60 V 30 H 0 Z' />

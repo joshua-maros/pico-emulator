@@ -5,13 +5,13 @@
 // The memory is made up of a list of registers.
 
 // Describes the last thing a register was used for.
-export type MemoryUse = 'none' | 'read' | 'write' | 'error' | 'instruction' | 'jump_target';
+export type CellUse = 'none' | 'read' | 'write' | 'error' | 'instruction' | 'jump_target';
 
-export default class MemoryCell
+export class DataCell<T>
 {
   #label: string;
-  #value: string | undefined = undefined;
-  lastUse: MemoryUse = 'none';
+  #value: T | undefined = undefined;
+  lastUse: CellUse = 'none';
 
   constructor(label: string)
   {
@@ -35,18 +35,16 @@ export default class MemoryCell
     return this.#label;
   }
 
-  get initialized(): boolean
-  {
-    return this.#value !== '?';
-  }
-
-  set value(value: string | undefined)
+  set value(value: T | undefined)
   {
     this.#value = value;
   }
 
-  get value(): string | undefined
+  get value(): T | undefined
   {
     return this.#value;
   }
-};
+}
+
+export class MemoryCell extends DataCell<string> { }
+export class FlagCell extends DataCell<boolean> { }

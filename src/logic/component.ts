@@ -165,6 +165,7 @@ export abstract class LogicComponent
 {
   // Type is used for error messages, e.g. [type] has no input named [bad name].
   constructor(
+    d: Datapath,
     private type: string,
     public id: string,
     public x: number,

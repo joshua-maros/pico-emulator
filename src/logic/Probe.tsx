@@ -8,9 +8,9 @@ export class Probe extends LogicComponent
   public in = new Input('in', 0, 10);
   public readonly width: number;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Probe", id, x, y);
+    super(d, "Probe", id, x, y);
     this.width = params.wid || 70;
   }
 

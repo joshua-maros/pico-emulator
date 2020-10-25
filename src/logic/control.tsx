@@ -17,12 +17,13 @@ export class Control extends LogicComponent
   public readonly top: boolean;
 
   constructor(
+    d: Datapath,
     id: string,
     x: number,
     y: number,
     params: any)
   {
-    super("Control", id, x, y);
+    super(d, "Control", id, x, y);
 
     let top = params.top !== false;
     this.top = top;

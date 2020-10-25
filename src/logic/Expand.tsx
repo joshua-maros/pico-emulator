@@ -12,9 +12,9 @@ export class Expand extends LogicComponent
   public readonly outNBits: number;
   public readonly extend: boolean;
 
-  constructor(id: string, x: number, y: number, params: any)
+  constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
-    super("Expand", id, x, y);
+    super(d, "Expand", id, x, y);
     this.inNBits = params.inNBits;
     this.outNBits = params.outNBits;
     this.extend = params.extend === true;
