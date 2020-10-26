@@ -106,19 +106,37 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
       // button blink on every tick of the timer.
       let speed = this.#fast ? 100 : 1000;
       this.#timer = window.setTimeout(() => this.timerTick(), speed);
+      this.setState(state => (
+        {
+          ...state,
+          flashStepBtn: !state.flashStepBtn
+        }
+      ));
     }
-    this.setState(state => (
-      {
-        ...state,
-        flashStepBtn: !state.flashStepBtn
-      }
-    ));
   }
 
   private doStep()
   {
     this.props.datapath.clock();
     this.props.datapath.eval();
+    const datapathMode = this.state.datapathLayout;
+    // In programmer view, we should step through entire instructions at a time.
+    // In datapath view, we show the individual clock cycles that happen to 
+    // make an instruction work.
+    if (!datapathMode)
+    {
+      let safetyCounter = 50;
+      while (!this.props.datapath.decoderCycleFinished && safetyCounter > 0)
+      {
+        this.props.datapath.clock();
+        this.props.datapath.eval();
+        safetyCounter--;
+      }
+      if (safetyCounter === 0)
+      {
+        throw new Error('Decoder did not finish in 50 cycles, probably a programming error.');
+      }
+    }
     if (this.props.datapath.haltRequested)
     {
       this.stopClock();
@@ -129,12 +147,6 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
   {
     this.stopClock();
     this.props.datapath.reset();
-    this.setState(state => (
-      {
-        ...state,
-        flashStepBtn: false,
-      }
-    ));
   }
 
   render()

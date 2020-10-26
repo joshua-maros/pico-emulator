@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryCell } from '../utils/memory_cells';
-import { asUnsignedBits, fromSignedBits } from '../utils/util';
+import { fromSignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 

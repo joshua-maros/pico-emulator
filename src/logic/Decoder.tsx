@@ -189,6 +189,7 @@ export class Decoder extends LogicComponent
     if (this.#currentCycle === this.#microcode.clockCycleNames.length)
     {
       this.#currentCycle = 0;
+      this.#datapath.decoderCycleFinished = true;
     }
   }
 

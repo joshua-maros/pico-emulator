@@ -69,6 +69,9 @@ export class Datapath
   public lastMessage = "Processor initialized.";
   public lastMessageWasError: boolean = false;
   public haltRequested: boolean = false;
+  // The decoder sets this to true whenever a clock() results in the decoder 
+  // switching back to its initial state/cycle.
+  public decoderCycleFinished: boolean = false;
 
   get components(): Array<LogicComponent>
   {
@@ -207,6 +210,8 @@ export class Datapath
   // Does a clock signal without doing eval before or after.
   public clock()
   {
+    this.decoderCycleFinished = false;
+    this.haltRequested = false;
     for (let c of this.#components)
     {
       c.evalClock();
