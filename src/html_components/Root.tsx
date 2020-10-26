@@ -129,6 +129,12 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
   {
     this.stopClock();
     this.props.datapath.reset();
+    this.setState(state => (
+      {
+        ...state,
+        flashStepBtn: false,
+      }
+    ));
   }
 
   render()

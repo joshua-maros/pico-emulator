@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryCell } from '../utils/memory_cells';
-import { asUnsignedBits } from '../utils/util';
+import { asUnsignedBits, fromSignedBits } from '../utils/util';
 import { Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
@@ -53,7 +53,7 @@ export class Latch extends LogicComponent
         let value = this.in.asInteger;
         if (value !== undefined)
         {
-          value = asUnsignedBits(value, this.nbits);
+          value = fromSignedBits(value, this.nbits);
           this.data.value = '' + value;
         }
         else

@@ -11,7 +11,7 @@ export function fromSignedBits(value: number, nbits: number): number
   const maxval = 1 << (nbits - 1);
   if (bits >= maxval)
   {
-    bits -= maxval;
+    bits -= maxval * 2;
   }
   return bits;
 }

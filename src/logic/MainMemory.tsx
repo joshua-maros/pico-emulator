@@ -56,13 +56,26 @@ export class MainMemory extends LogicComponent
     }
     else if (this.memw.asBoolean === true)
     {
-      usage = 'write';
-      this.#cells[addr].value = this.din.value;
       this.addr.used = true;
       this.din.used = true;
       this.memw.used = true;
     }
     this.#cells[addr].lastUse = usage;
+  }
+
+  public evalClock()
+  {
+    const addr = this.addr.asInteger;
+    if (addr === undefined) return;
+    if (addr >= this.length || addr < 0)
+    {
+      throw new Error('there is no memory cell at address ' + addr);
+    }
+    if (this.memw.asBoolean === true && this.memr.asBoolean === false)
+    {
+      this.#cells[addr].lastUse = 'write';
+      this.#cells[addr].value = this.din.value;
+    }
   }
 
   public render(k: string, d: Datapath)

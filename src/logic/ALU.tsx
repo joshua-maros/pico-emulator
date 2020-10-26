@@ -130,7 +130,7 @@ export class ALU extends LogicComponent
     if (in1 !== undefined)
     {
       let result = in1 + 1;
-      this.finishUp(result, in1, 1);
+      this.finishUp(result, 1, in1);
     }
   }
 
@@ -140,6 +140,17 @@ export class ALU extends LogicComponent
     if (in0 !== undefined)
     {
       let in1 = asUnsignedBits(-1, this.nBits);
+      let result = in0 + in1;
+      this.finishUp(result, in0, in1);
+    }
+  }
+
+  doDECB()
+  {
+    const in1 = this.in1.asInteger;
+    if (in1 !== undefined)
+    {
+      let in0 = asUnsignedBits(-1, this.nBits);
       let result = in0 + in1;
       this.finishUp(result, in0, in1);
     }
@@ -229,14 +240,17 @@ export class ALU extends LogicComponent
       case 'INC':
         this.doINC();
         break;
+      case 'INCB':
+        this.doINCB();
+        break;
       case 'DEC':
         this.doDEC();
         break;
+      case 'DECB':
+        this.doDECB();
+        break;
       case 'ZERO':
         this.doZERO();
-        break;
-      case 'INCB':
-        this.doINCB();
         break;
       case 'RAL':
         this.doRAL();

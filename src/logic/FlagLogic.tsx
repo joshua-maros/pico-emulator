@@ -169,6 +169,15 @@ export class FlagLogic extends LogicComponent
     }
   }
 
+  public reset()
+  {
+    this.flagC.value = false;
+    this.flagN.value = false;
+    this.flagTZ.value = false;
+    this.flagV.value = false;
+    this.flagZ.value = false;
+  }
+
   public render(k: string, d: Datapath)
   {
     return (<FlagLogicView key={k} c={this} d={d} />)

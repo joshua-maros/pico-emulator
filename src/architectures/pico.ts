@@ -290,7 +290,7 @@ export const PICO: DatapathDef = {
       id: 'ALU',
       x: x3 + 210,
       y: y3 + 75,
-      nBits: 12
+      nbits: 12
     },
     {
       type: 'FlagLogic',
@@ -306,7 +306,7 @@ export const PICO: DatapathDef = {
       y: y3 + 175,
       wid: 60,
       top: true,
-      options: ['ADD', 'AND', 'INC', 'INCB', 'CMA', 'NEG', 'RAL', 'RAR', 'ZERO', 'ONES']
+      options: ['ADD', 'AND', 'INC', 'INCB', 'DEC', 'DECB', 'CMA', 'NEG', 'RAL', 'RAR', 'ZERO', 'ONES']
     },
     {
       type: 'Control',
@@ -571,7 +571,35 @@ export const PICO: DatapathDef = {
       'TAD;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
       'TADI;fldpc;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
       'TADR;rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ',
+      'ISZR;fldpc,rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ',
+      'DCA;rdir,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+      'DCAR;rdir,aout,memr,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+      'JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc',
+      'JMSR;fldpc,rdir,aout,memr,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc',
+      'JMP;rdir,incsel,fldpc;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
+      'JMPR;rdir,aout,memr,din,psel,fldpc',
+      'NOP;fldpc',
+      'IAC;op:INC,fop:LDALL,lda;fldpc',
+      'RAL;op:RAL,fop:ROT,lda;fldpc',
+      'RAR;op:RAR,fop:ROT,lda;fldpc',
+      'CMA;op:CMA,lda;fldpc',
+      'CIA;op:NEG,lda;fldpc',
       'CLA;op:ZERO,lda;fldpc',
+      'STA;op:ONES,lda;fldpc',
+      'CLC;fop:CLC;fldpc',
+      'STC;fop:STC;fldpc',
+      'CMC;fop:CMC;fldpc',
+      'SKP;fldpc;fldpc',
+      'SCC;fop:RDNC,cldpc;fldpc',
+      'SCS;fop:RDC,cldpc;fldpc',
+      'SZC;fop:RDNZ,cldpc;fldpc',
+      'SZS;fop:RDZ,cldpc;fldpc',
+      'SNC;fop:RDNN,cldpc;fldpc',
+      'SNS;fop:RDN,cldpc;fldpc',
+      'MQA;asel,lda;fldpc',
+      'MQL;rda,ldq;fldpc',
+      'SWP;rda,ldt;asel,lda;rdt,ldq;fldpc',
     ],
   }
 };

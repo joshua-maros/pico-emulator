@@ -87,11 +87,14 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
     const changeValue = (event: React.ChangeEvent<HTMLInputElement>) =>
     {
       let value = event.target.value.toUpperCase();
-      this.props.datapath.eval();
       this.setState(
         state =>
         {
-          state.editing.cell.value = value;
+          if (value === '?')
+            state.editing.cell.value = undefined;
+          else
+            state.editing.cell.value = value;
+          this.props.datapath.eval();
           return state;
         }
       );
@@ -151,6 +154,9 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
       ));
     }
 
+    const value = this.state.editing.cell.value;
+    const fval = value === undefined ? '?' : value;
+
     return (
       <div className={style.processor}>
         <div className={style.left_controls}>
@@ -164,7 +170,7 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
           <div className={style.label}>Value:</div>
           <input
             ref={this.textBoxRef}
-            value={this.state.editing.cell.value}
+            value={fval}
             onChange={changeValue}
             onKeyUp={inputKeyUp}
           />
