@@ -125,6 +125,7 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
     {
       this.stopClock();
     }
+    const dp = this.props.datapath;
     const datapathMode = this.state.datapathLayout;
     // In programmer view, we should step through entire instructions at a time.
     // In datapath view, we show the individual clock cycles that happen to 
@@ -132,16 +133,24 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
     if (!datapathMode)
     {
       let safetyCounter = 50;
-      while (!this.props.datapath.decoderCycleFinished && safetyCounter > 0)
+      while (!dp.decoderCycleFinished && safetyCounter > 0)
       {
-        this.props.datapath.clock();
-        this.props.datapath.eval();
+        dp.clock();
+        dp.eval();
         safetyCounter--;
       }
       if (safetyCounter === 0)
       {
         throw new Error('Decoder did not finish in 50 cycles, probably a programming error.');
       }
+    }
+    if (dp.lastMessageWasError)
+    {
+      this.stopClock();
+    }
+    else if (dp.decoderCycleFinished)
+      {
+        dp.lastMessage = dp.decoder?.getInstructionDescription() || "(No description provided for last instruction.)";
     }
   }
 

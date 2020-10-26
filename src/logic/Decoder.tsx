@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { ComponentUsageError, Input, LogicComponent } from "./component";
+import React from 'react';
+import { ComponentUsageError, Input, LogicComponent, Output } from "./component";
 import { Control } from './control';
 import { Datapath } from './datapath';
 
@@ -12,6 +12,124 @@ export interface UnparsedDecoderMicrocode
   clockCycleNames: Array<string>,
   fetchCycleStep: string,
   instructions: Array<string>,
+}
+
+function makeProceduralPiece(input: string, valueSource: Output, datapath: Datapath): () => string
+{
+  if (input.includes('-'))
+  {
+    const decrement = input.split('-')[1];
+    const pdec = parseInt(decrement);
+    return () =>
+    {
+      const v = valueSource.value;
+      console.log(v);
+      return v === undefined ? '?' : '' + (parseInt(v) - pdec);
+    }
+  }
+  else if (input.includes('+'))
+  {
+    const decrement = input.split('+')[1];
+    const pdec = parseInt(decrement);
+    return () =>
+    {
+      const v = valueSource.value;
+      console.log(v);
+      return v === undefined ? '?' : '' + (parseInt(v) + pdec);
+    }
+  }
+  else if (input.includes('?'))
+  {
+    const choicestr = input.split('?')[1];
+    const choices = choicestr.split(':');
+    return () =>
+    {
+      const v = valueSource.value;
+      console.log(v);
+      if (v === 'true' || v === '1')
+      {
+        return choices[0];
+      }
+      else
+      {
+        return choices[1];
+      }
+    }
+  }
+  else
+  {
+    return () =>
+    {
+      const v = valueSource.value;
+      return v === undefined ? '?' : v;
+    };
+  }
+}
+
+function parseCompleteMessage(input: string, datapath: Datapath): { preferredCycle: number, generator: () => string }
+{
+  let preferredCycle = 0;
+  if (input.startsWith('('))
+  {
+    let s = input.split(')', 2);
+    preferredCycle = parseInt(s[0].slice(1).trim());
+    input = s.slice(1).join(')').trim();
+  }
+  let pieces: Array<() => string> = [];
+  let buffer = '';
+  let parsingExpr = false;
+  for (const c of input)
+  {
+    if (c === '<' && !parsingExpr)
+    {
+      const copied = '' + buffer;
+      pieces.push(() => copied);
+      buffer = '';
+      parsingExpr = true;
+    }
+    else if (c === '>' && parsingExpr)
+    {
+      const compId = buffer.split(/[-+?]/)[0];
+      let success = false;
+      for (const c of datapath.components)
+      {
+        if (c.id === compId)
+        {
+          success = true;
+          const output = (c as any).out;
+          if (output instanceof Output)
+          {
+            pieces.push(makeProceduralPiece(buffer, output, datapath));
+          }
+          else
+          {
+            throw new Error('The component ' + compId + ' does not have an output named "out", so it cannot be used in this expression:\n' + input);
+          }
+        }
+      }
+      if (!success)
+      {
+        throw new Error('There is no component with ID ' + compId);
+      }
+      buffer = '';
+      parsingExpr = false;
+    }
+    else
+    {
+      buffer += c;
+    }
+  }
+  pieces.push(() => buffer);
+  const generator = () =>
+  {
+    let result = '';
+    for (const piece of pieces)
+    {
+      result += piece();
+    }
+    return result;
+  };
+  return { preferredCycle, generator };
 }
 
 function parseControlList(input: string, datapath: Datapath): () => void
@@ -61,14 +179,16 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
   for (const instr of input.instructions)
   {
     const parts = instr.trim().split(';');
-    const opcode = parts[0];
-    const steps = parts.slice(1);
+    const completeMessage = parts[0];
+    const opcode = parts[1];
+    const steps = parts.slice(2);
     if (steps.length > result.clockCycleNames.length - 1)
     {
       throw new Error('The instruction ' + opcode + ' has too many steps! Try adding another step to clockCycleNames.');
     }
     result.instructions.push({
       opcode: opcode.trim(),
+      completeMessage: parseCompleteMessage(completeMessage, datapath),
       steps: steps.map(step => parseControlList(step.trim(), datapath))
     });
   }
@@ -78,6 +198,7 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
 class DecoderInstruction
 {
   opcode = "";
+  completeMessage = { preferredCycle: 0, generator: () => "" };
   steps: Array<() => void> = [];
 }
 
@@ -96,6 +217,7 @@ export class Decoder extends LogicComponent
   #datapath: Datapath;
   #microcode: DecoderMicrocode;
   #currentCycle = 0;
+  #lastInstrDesc = '';
 
   constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
@@ -180,6 +302,14 @@ export class Decoder extends LogicComponent
       c.reset();
     }
     this.doCurrentStepAction();
+    if (this.in.value !== undefined && this.in.value !== 'HLT')
+    {
+      const ci = this.getCurrentInstruction();
+      if (this.#currentCycle === ci.completeMessage.preferredCycle)
+      {
+        this.#lastInstrDesc = ci.completeMessage.generator();
+      }
+    }
   }
 
   public evalClock()
@@ -190,6 +320,20 @@ export class Decoder extends LogicComponent
     {
       this.#currentCycle = 0;
       this.#datapath.decoderCycleFinished = true;
+    }
+  }
+
+  // Call this after an instruction has completed to get a description of what
+  // just happened.
+  public getInstructionDescription(): string
+  {
+    if (this.in.value === 'HLT')
+    {
+      return 'Processor halted.';
+    }
+    else
+    {
+    return this.#lastInstrDesc;
     }
   }
 

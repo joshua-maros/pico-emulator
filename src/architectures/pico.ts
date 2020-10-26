@@ -220,6 +220,12 @@ export const PICO: DatapathDef = {
       extend: false
     },
     {
+      type: 'Decoder',
+      id: 'Dec',
+      x: x2 + 80,
+      y: y2 + 145
+    },
+    {
       type: 'Tristate',
       id: 'IR2A',
       x: x2 + 150,
@@ -234,12 +240,6 @@ export const PICO: DatapathDef = {
       y: y2 + 145,
       wid: 40,
       top: true,
-    },
-    {
-      type: 'Decoder',
-      id: 'Dec',
-      x: x2 + 80,
-      y: y2 + 145
     },
 
     // Arithmetic section
@@ -588,44 +588,71 @@ export const PICO: DatapathDef = {
     { inputs: ['HltA.out'], outputs: ['Mem.highlight_addr'], path: 'H' },
   ],
   microcode: {
-    clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3', 't4'],
+    clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3', 't4', 't5'],
     fetchCycleStep: 'rdpca,aout,memr,din,ldir,hlti',
     instructions: [
-      'AND;rdir,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
-      'ANDI;fldpc;rdpca,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
-      'ANDR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
-      'TAD;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
-      'TADI;fldpc;rdpca,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
-      'TADR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
-      'ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ',
-      'ISZR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ',
-      'DCA;rdir,aout,memw,rda,dout;op:ZERO,lda;fldpc',
-      'DCAR;rdir,aout,memr,hlta,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
-      'JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc;rdpca,aout,hltj',
-      'JMSR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc;rdpca,aout,hltj',
-      'JMP;rdir,incsel,fldpc,aout,hltj;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
-      'JMPR;rdir,aout,memr,hlta,din,psel,fldpc;rdpca,aout,hltj',
-      'NOP;fldpc',
-      'IAC;op:INC,fop:LDALL,lda;fldpc',
-      'RAL;op:RAL,fop:ROT,lda;fldpc',
-      'RAR;op:RAR,fop:ROT,lda;fldpc',
-      'CMA;op:CMA,lda;fldpc',
-      'CIA;op:NEG,lda;fldpc',
-      'CLA;op:ZERO,lda;fldpc',
-      'STA;op:ONES,lda;fldpc',
-      'CLC;fop:CLC;fldpc',
-      'STC;fop:STC;fldpc',
-      'CMC;fop:CMC;fldpc',
-      'SKP;fldpc;fldpc',
-      'SCC;fop:RDNC,cldpc;fldpc',
-      'SCS;fop:RDC,cldpc;fldpc',
-      'SZC;fop:RDNZ,cldpc;fldpc',
-      'SZS;fop:RDZ,cldpc;fldpc',
-      'SNC;fop:RDNN,cldpc;fldpc',
-      'SNS;fop:RDN,cldpc;fldpc',
-      'MQA;asel,lda;fldpc',
-      'MQL;rda,ldq;fldpc',
-      'SWP;rda,ldt;asel,lda;rdt,ldq;fldpc',
+      '<T> from MEM[<ExIR>] is ANDed to ACC.' +
+      ';AND;rdir,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      '<T> from MEM[<PC-1>] is ANDed to ACC.' +
+      ';ANDI;fldpc;rdpca,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      '<T> from MEM[<S>] is ANDed to ACC.' +
+      ';ANDR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+
+      '<T> from MEM[<ExIR>] is added to ACC.' +
+      ';TAD;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      '<T> from MEM[<PC-1>] is added to ACC.' +
+      ';TADI;fldpc;rdpca,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      '<T> from MEM[<S>] is added to ACC.' +
+      ';TADR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+
+      '(3)Incremented MEM[<ExIR>] to <T>, <Flags?skipped over:continued to> next instruction.' +
+      ';ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ;rdpca,aout,hltj',
+      '(4)Incremented MEM[<S>] to <T>, <Flags?skipped over:continued to> next instruction.' +
+      ';ISZR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ;rdpca,aout,hltj',
+
+      '(1)Wrote <ACC> to MEM[<ExIR>] and cleared ACC.' +
+      ';DCA;rdir,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+      '(2)Wrote <ACC> to MEM[<S>] and cleared ACC.' +
+      ';DCAR;rdir,aout,memr,hlta,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+
+      'Jumped to subroutine at MEM[<ExIR+1>], placing return address at MEM[<ExIR>].' +
+      ';JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc;rdpca,aout,hltj',
+      'Jumped to subroutine at MEM[<S+1>], placing return address at MEM[<S>].' +
+      ';JMSR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc;rdpca,aout,hltj',
+      'Jumped to MEM[<PC>].' +
+      ';JMP;rdir,incsel,fldpc,aout,hltj;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
+      'Jumped to MEM[<PC>].' +
+      ';JMPR;rdir,aout,memr,hlta,din,psel,fldpc;rdpca,aout,hltj',
+
+      'Did nothing.;NOP;fldpc',
+      'Incremented accumulator.;IAC;op:INC,fop:LDALL,lda;fldpc',
+      'Shifted accumulator left through carry.;RAL;op:RAL,fop:ROT,lda;fldpc',
+      'Shifted accumulator right through carry.;RAR;op:RAR,fop:ROT,lda;fldpc',
+      'Complemeted accumulator.;CMA;op:CMA,lda;fldpc',
+      'Negated accumulator.;CIA;op:NEG,lda;fldpc',
+      'Cleared accumulator;CLA;op:ZERO,lda;fldpc',
+      'Set accumulator.;STA;op:ONES,lda;fldpc',
+      'Cleared carry flag.;CLC;fop:CLC;fldpc',
+      'Set carry flag.;STC;fop:STC;fldpc',
+      'Complemented carry flag.;CMC;fop:CMC;fldpc',
+      'Skipped over the next instruction.;SKP;fldpc;fldpc',
+
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?not set:set>.' +
+      ';SCC;fop:RDNC,cldpc;fldpc;rdpca,aout,hltj',
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?set:not set>.' +
+      ';SCS;fop:RDC,cldpc;fldpc;rdpca,aout,hltj',
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?not set:set>.' +
+      ';SZC;fop:RDNZ,cldpc;fldpc;rdpca,aout,hltj',
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?set:not set>.' +
+      ';SZS;fop:RDZ,cldpc;fldpc;rdpca,aout,hltj',
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?not set:set>.' +
+      ';SNC;fop:RDNN,cldpc;fldpc;rdpca,aout,hltj',
+      '(1)<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?set:not set>.' +
+      ';SNS;fop:RDN,cldpc;fldpc;rdpca,aout,hltj',
+
+      'Copied the value of Q into A.;MQA;asel,lda;fldpc',
+      'Copied the value of A into Q.;MQL;rda,ldq;fldpc',
+      'Swapped the values of A and Q.;SWP;rda,ldt;asel,lda;rdt,ldq;fldpc',
     ],
   }
 };

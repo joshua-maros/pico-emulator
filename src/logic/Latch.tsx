@@ -1,7 +1,7 @@
 import React from 'react';
 import { MemoryCell } from '../utils/memory_cells';
 import { fromSignedBits } from '../utils/util';
-import { Input, LogicComponent, Output } from "./component";
+import { ComponentUsageError, Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
 export class Latch extends LogicComponent
@@ -63,6 +63,7 @@ export class Latch extends LogicComponent
       if (this.data.value === undefined)
       {
         this.data.lastUse = 'error';
+        throw new ComponentUsageError('Register ' + this.name + ' assigned invalid/uninitialized data.');
       }
       else
       {
