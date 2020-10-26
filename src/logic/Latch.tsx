@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryCell } from '../utils/memory_cells';
-import { asUnsignedBits } from '../utils/util';
+import { asUnsignedBits, fromSignedBits } from '../utils/util';
 import { ComponentUsageError, Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
@@ -14,6 +14,7 @@ export class Latch extends LogicComponent
   public readonly resetValue: string | undefined;
   public readonly nbits: number | undefined;
   public data: MemoryCell;
+  public readonly signed: boolean;
 
   constructor(d: Datapath, id: string, x: number, y: number, params: any)
   {
@@ -30,6 +31,7 @@ export class Latch extends LogicComponent
     {
       d.visibleRegisters.push(this.data);
     }
+    this.signed = params.signed !== false;
   }
 
   public eval()
@@ -52,7 +54,14 @@ export class Latch extends LogicComponent
         let value = this.in.asInteger;
         if (value !== undefined)
         {
-          value = asUnsignedBits(value, this.nbits);
+          if (this.signed)
+          {
+            value = fromSignedBits(value, this.nbits);
+          }
+          else
+          {
+            value = asUnsignedBits(value, this.nbits);
+          }
           this.data.value = '' + value;
         }
         else

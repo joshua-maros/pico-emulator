@@ -71,6 +71,7 @@ export const PICO: DatapathDef = {
       nbits: 7,
       resetValue: 0,
       visible: true,
+      signed: false,
     },
     {
       type: 'AndOr',
@@ -166,7 +167,8 @@ export const PICO: DatapathDef = {
       name: 'S',
       x: x2 + 70,
       y: y2 - 10,
-      nbits: 7
+      nbits: 7,
+      signed: false,
     },
     {
       type: 'Control',
