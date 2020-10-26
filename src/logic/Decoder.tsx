@@ -1,5 +1,5 @@
-import React from 'react';
-import { Input, LogicComponent } from "./component";
+import React, { Component } from 'react';
+import { ComponentUsageError, Input, LogicComponent } from "./component";
 import { Control } from './control';
 import { Datapath } from './datapath';
 
@@ -131,12 +131,12 @@ export class Decoder extends LogicComponent
     const currentInstruction = this.in.value;
     if (currentInstruction === undefined)
     {
-      throw new Error('Uninitialized value used as instruction.');
+      throw new ComponentUsageError('Uninitialized value used as instruction.');
     }
     const opcode = currentInstruction.trim().split(' ').reverse().pop();
     if (opcode === undefined)
     {
-      throw new Error(currentInstruction + ' is not a valid instruction.');
+      throw new ComponentUsageError(currentInstruction + ' is not a valid instruction.');
     }
     for (const instr of this.#microcode.instructions)
     {
@@ -145,7 +145,7 @@ export class Decoder extends LogicComponent
         return instr;
       }
     }
-    throw new Error(opcode + ' is not a valid instruction opcode.');
+    throw new ComponentUsageError(opcode + ' is not a valid instruction opcode.');
   }
 
   private doCurrentStepAction()

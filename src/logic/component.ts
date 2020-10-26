@@ -70,14 +70,12 @@ export class Input
     let value = this.value;
     if (typeof value === 'string')
     {
-      try
+      const parsed = parseInt(value);
+      if (isNaN(parsed))
       {
-        return parseInt(value);
+        throw new ComponentUsageError('Expected a number, but got ' + value + ' instead.');
       }
-      catch
-      {
-        throw new Error('Emulator error: ' + value + ' is not a valid boolean.');
-      }
+      return parsed;
     }
     return undefined;
   }
@@ -222,3 +220,6 @@ export abstract class LogicComponent
   public abstract render(key: string, d: Datapath): JSX.Element
 }
 
+export class ComponentUsageError extends Error
+{
+}

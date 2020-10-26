@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlagCell, MemoryCell } from '../utils/memory_cells';
 import { ALU } from './ALU';
-import { LogicComponent } from "./component";
+import { ComponentUsageError, LogicComponent } from "./component";
 import { Bus } from "./connections";
 import { Control } from './control';
 import { Decoder, UnparsedDecoderMicrocode } from './Decoder';
@@ -181,6 +181,8 @@ export class Datapath
     {
       c.reset();
     }
+    this.lastMessage = 'Processor reset.';
+    this.lastMessageWasError = false;
     this.eval();
   }
 
@@ -188,6 +190,8 @@ export class Datapath
   // the program.
   public eval()
   {
+    let error: string | undefined = undefined;
+    let exception: Error | undefined = undefined;
     // This is a hacky way to make sure changes propogate through the whole circuit.
     const doWork = (iters: number) =>
     {
@@ -195,7 +199,25 @@ export class Datapath
       {
         for (let c of this.#components)
         {
-          c.eval();
+          try
+          {
+            c.eval();
+          }
+          catch (e)
+          {
+            if (e instanceof ComponentUsageError)
+            {
+              if (error === undefined)
+              {
+                error = e.message;
+              }
+            }
+            else if (exception === undefined)
+            {
+              error = 'Emulator error: encountered JavaScript exception, see console for details.';
+              exception = e;
+            }
+          }
         }
       }
     };
@@ -205,7 +227,16 @@ export class Datapath
       b.clearUsedBy();
     }
     doWork(10);
+    if (error !== undefined)
+    {
+      this.lastMessage = error;
+      this.lastMessageWasError = true;
+    }
     this.changeListener();
+    if (exception !== undefined)
+    {
+      throw exception;
+    }
   }
 
   // Clears highlights showing things like the last usage of a particular
@@ -223,11 +254,41 @@ export class Datapath
   // Does a clock signal without doing eval before or after.
   public clock()
   {
+    let error: string | undefined = undefined;
+    let exception: Error | undefined = undefined;
     this.decoderCycleFinished = false;
     this.haltRequested = false;
     for (let c of this.#components)
     {
-      c.evalClock();
+      try
+      {
+        c.evalClock();
+      }
+      catch (e)
+      {
+        if (e instanceof ComponentUsageError)
+        {
+          if (error === undefined)
+          {
+            error = e.message;
+          }
+        }
+        else if (exception === undefined)
+        {
+          error = 'Emulator error: encountered JavaScript exception, see console for details.';
+          exception = e;
+        }
+      }
+    }
+    if (error !== undefined)
+    {
+      this.lastMessage = error;
+      this.lastMessageWasError = true;
+      this.changeListener();
+    }
+    if (exception !== undefined)
+    {
+      throw exception;
     }
   }
 }

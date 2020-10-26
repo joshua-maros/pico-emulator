@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryCell, CellUse } from '../utils/memory_cells';
-import { Input, LogicComponent, Output } from "./component";
+import { ComponentUsageError, Input, LogicComponent, Output } from "./component";
 import { Datapath } from './datapath';
 
 export class MainMemory extends LogicComponent
@@ -47,7 +47,7 @@ export class MainMemory extends LogicComponent
     if (addr === undefined) return;
     if (addr >= this.length || addr < 0)
     {
-      throw new Error('there is no memory cell at address ' + addr);
+      throw new ComponentUsageError('there is no memory cell at address ' + addr);
     }
     if (this.memr.asBoolean === true)
     {
@@ -81,7 +81,7 @@ export class MainMemory extends LogicComponent
     if (addr === undefined) return;
     if (addr >= this.length || addr < 0)
     {
-      throw new Error('there is no memory cell at address ' + addr);
+      throw new ComponentUsageError('There is no memory cell at address ' + addr);
     }
     let usage: CellUse = 'none';
     if (this.memw.asBoolean === false && this.memr.asBoolean === true)
@@ -104,6 +104,10 @@ export class MainMemory extends LogicComponent
       if (this.highlight_addr.asBoolean === true) usage = 'address';
     }
     this.#cells[addr].lastUse = usage;
+    if (usage === 'error')
+    {
+      throw new ComponentUsageError('Cannot read from uninitialized memory at address ' + addr);
+    }
   }
 
   public clearHighlights()

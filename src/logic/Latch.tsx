@@ -66,7 +66,6 @@ export class Latch extends LogicComponent
       }
       else
       {
-
         this.data.lastUse = 'write';
       }
     }
