@@ -94,7 +94,7 @@ class LatchView extends React.Component<{ c: Latch, d: Datapath }>
       <g transform={xfrm} className="component">
         <rect x={0} y={0} width={30} height={50} className={this.props.c.data.lastUseCssClass} />
         <text className="label" x={15} y={23} textAnchor="middle">{label}</text>
-        <text className="value" x={33} y={7}>{fval}</text>
+        <text className="value" x={0} y={-2}>{fval}</text>
       </g>);
   }
 };

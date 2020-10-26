@@ -16,7 +16,7 @@
 }
 
 body {
-  margin: 0;
+  margin: 0.5em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
@@ -45,6 +45,16 @@ code {
   color: rgba(0, 0, 0, 1);
   text-align: center;
   cursor: pointer;
+}
+
+.flat-button.pressed, .flat-button:hover
+{
+  background: #EEE;
+}
+
+.flat-button:active
+{
+  background: #FFF;
 }
 
 #board {

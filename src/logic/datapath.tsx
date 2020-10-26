@@ -70,13 +70,6 @@ export class Datapath
   public lastMessageWasError: boolean = false;
   public haltRequested: boolean = false;
 
-  // Are we 'running' the code for a processor?
-  #running = false;
-  // Are we running fast or slow?
-  #fast = false;
-  // The timer used while running
-  #timer: number | undefined = undefined;
-
   get components(): Array<LogicComponent>
   {
     return this.#components;
@@ -217,45 +210,6 @@ export class Datapath
     for (let c of this.#components)
     {
       c.evalClock();
-    }
-  }
-
-  // Does a clock and evals afterwards.
-  public step()
-  {
-    this.clock();
-    this.eval();
-  }
-
-  startRunning(fast: boolean)
-  {
-    this.#fast = fast;
-    if (this.#running === false)
-    {
-      this.#running = true;
-      this.timerTick();
-    }
-  }
-
-  // Stop the current 'run' of the processor
-  halt()
-  {
-    if (this.#running) {
-      clearTimeout(this.#timer);
-      this.#running = false;
-    }
-  }
-
-  private timerTick()
-  {
-    clearTimeout(this.#timer);
-    this.#timer = undefined;
-    this.clock();
-    this.eval();
-    if (this.#running)
-    {
-      let speed = this.#fast ? 200 : 2000;
-      this.#timer = window.setTimeout(() => this.timerTick(), speed);
     }
   }
 }

@@ -154,6 +154,13 @@ export class Decoder extends LogicComponent
     {
       return this.#microcode.fetchCycleAction();
     }
+    else if (this.in.value === 'HLT')
+    {
+      // This is special cased because the clock (and correspondingly halting) 
+      // is controlled by regular javascript code and has no corresponding 
+      // component.
+      this.#datapath.haltRequested = true;
+    }
     else
     {
       const steps = this.getCurrentInstruction().steps;
