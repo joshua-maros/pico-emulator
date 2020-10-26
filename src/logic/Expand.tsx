@@ -22,12 +22,13 @@ export class Expand extends LogicComponent
 
   public eval()
   {
-    let value = this.in.asInteger;
-    if (value === undefined)
+    let strValue = this.in.value;
+    if (strValue=== undefined)
     {
       this.out.clear();
       return;
     }
+    let value = parseInt(strValue.trim().split(' ').pop() || 'asdfasdf');
     value = asUnsignedBits(value, this.inNBits);
     let outValue = asUnsignedBits(value, this.outNBits);
     if (this.outNBits > this.inNBits && this.extend)

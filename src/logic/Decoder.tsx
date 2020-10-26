@@ -63,7 +63,7 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
     const parts = instr.trim().split(';');
     const opcode = parts[0];
     const steps = parts.slice(1);
-    if (steps.length > result.clockCycleNames.length)
+    if (steps.length > result.clockCycleNames.length - 1)
     {
       throw new Error('The instruction ' + opcode + ' has too many steps! Try adding another step to clockCycleNames.');
     }

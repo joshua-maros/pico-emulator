@@ -68,6 +68,7 @@ export class Datapath
   public decoder: Decoder | undefined = undefined;
   public lastMessage = "Processor initialized.";
   public lastMessageWasError: boolean = false;
+  public haltRequested: boolean = false;
 
   // Are we 'running' the code for a processor?
   #running = false;

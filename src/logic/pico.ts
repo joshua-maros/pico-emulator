@@ -562,10 +562,16 @@ export const PICO: DatapathDef = {
     }
   ],
   microcode: {
-    clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3'],
+    clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3', 't4'],
     fetchCycleStep: 'rdpca,aout,memr,din,ldir',
     instructions: [
-      'CLA;op:ZERO,lda;fldpc'
+      'AND;rdir,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      'ANDI;fldpc;rdpca,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      'ANDR;rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      'TAD;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'TADI;fldpc;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'TADR;rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'CLA;op:ZERO,lda;fldpc',
     ],
   }
 };
