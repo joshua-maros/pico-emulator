@@ -46,3 +46,10 @@
   margin-top: auto;
   margin-bottom: auto;
 }
+
+.key > * {
+  display: inline-block;
+  padding: 0.5em;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}

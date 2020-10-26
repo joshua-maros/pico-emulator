@@ -187,6 +187,21 @@ export default class ProgrammerLayout extends React.Component<Props, State> {
             onClick={() => this.shiftMemoryDown(this.state.editing.memoryIndex || 0)}
             disabled={!isEditingMemory}
           >Shift Down</button>
+
+          <div />
+          <div style={{ height: '2em' }} />
+
+          <div />
+          <div className={style.key}>
+            <span className="use_read">Read</span>
+            <span className="use_write">Written</span>
+            <br />
+            <span className="use_instruction">Instruction</span>
+            <span className="use_jump_target">Jump Target</span>
+            <br />
+            <span className="use_address">Used As Address</span>
+            <span className="use_error">Error</span>
+          </div>
         </div>
         <MemoryGrid
           memoryBlock={datapath.mainMemoryBlock}
