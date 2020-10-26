@@ -13,6 +13,7 @@ type Props = {
 export default class MemoryCellView extends React.Component<Props> {
   render()
   {
+    const cssc = this.props.cell.lastUseCssClass;
     const v = this.props.cell.value;
     const text = v === undefined ? '?' : v;
     return (
@@ -21,6 +22,7 @@ export default class MemoryCellView extends React.Component<Props> {
         className={
           style.root
           + (this.props.focused ? ' ' + style.focused : '')
+          + ' ' + cssc
         }
       >
         {text}

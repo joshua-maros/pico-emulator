@@ -5,7 +5,7 @@
 // The memory is made up of a list of registers.
 
 // Describes the last thing a register was used for.
-export type CellUse = 'none' | 'read' | 'write' | 'error' | 'instruction' | 'jump_target';
+export type CellUse = 'none' | 'read' | 'write' | 'error' | 'instruction' | 'jump_target' | 'address';
 
 export class DataCell<T>
 {

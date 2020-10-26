@@ -11,6 +11,10 @@ export class MainMemory extends LogicComponent
   public memw: Input;
   public din: Input;
   public dout: Output;
+  // Use these to highlight a memory address with what it was used for.
+  public highlight_instr = new Input("highlight_instr", 0, 400);
+  public highlight_jumpt = new Input("highlight_jumpt", 0, 425);
+  public highlight_addr = new Input("highlight_addr", 0, 450);
   public readonly addrbits: number;
   public readonly databits: number;
   public readonly length: number;
@@ -29,11 +33,11 @@ export class MainMemory extends LogicComponent
     }
     d.mainMemoryBlock = this.#cells;
 
-    this.addr = new Input('addr', -20, params.addrY || 0);
-    this.memr = new Input('memr', -20, params.memrY || 0);
-    this.memw = new Input('memw', -20, params.memwY || 0);
-    this.din = new Input('din', -20, params.dataY || 0);
-    this.dout = new Output('dout', -20, (params.dataY || 0) - 20);
+    this.addr = new Input('addr', 0, params.addrY || 0);
+    this.memr = new Input('memr', 0, params.memrY || 0);
+    this.memw = new Input('memw', 0, params.memwY || 0);
+    this.din = new Input('din', 0, params.dataY || 0);
+    this.dout = new Output('dout', 0, (params.dataY || 0) - 20);
   }
 
   public eval()
@@ -45,11 +49,9 @@ export class MainMemory extends LogicComponent
     {
       throw new Error('there is no memory cell at address ' + addr);
     }
-    let usage: CellUse = 'none';
     if (this.memr.asBoolean === true)
     {
       if (this.memw.asBoolean === true) return;
-      usage = 'read';
       this.dout.value = this.#cells[addr].value;
       this.addr.used = true;
       this.memr.used = true;
@@ -60,7 +62,17 @@ export class MainMemory extends LogicComponent
       this.din.used = true;
       this.memw.used = true;
     }
-    this.#cells[addr].lastUse = usage;
+    if (this.highlight_instr.asBoolean === true) this.highlight_instr.used = true;
+    if (this.highlight_jumpt.asBoolean === true) this.highlight_jumpt.used = true;
+    if (this.highlight_addr.asBoolean === true) this.highlight_addr.used = true;
+    if (
+      this.highlight_instr.asBoolean === true
+      || this.highlight_jumpt.asBoolean === true
+      || this.highlight_addr.asBoolean === true
+    )
+    {
+      this.addr.used = true;
+    }
   }
 
   public evalClock()
@@ -71,10 +83,34 @@ export class MainMemory extends LogicComponent
     {
       throw new Error('there is no memory cell at address ' + addr);
     }
-    if (this.memw.asBoolean === true && this.memr.asBoolean === false)
+    let usage: CellUse = 'none';
+    if (this.memw.asBoolean === false && this.memr.asBoolean === true)
     {
-      this.#cells[addr].lastUse = 'write';
+      usage = 'read';
+    }
+    else if (this.memw.asBoolean === true && this.memr.asBoolean === false)
+    {
+      usage = 'write';
       this.#cells[addr].value = this.din.value;
+    }
+    if (usage === 'read' && this.dout.value === undefined)
+    {
+      usage = 'error';
+    }
+    else
+    {
+      if (this.highlight_instr.asBoolean === true) usage = 'instruction';
+      if (this.highlight_jumpt.asBoolean === true) usage = 'jump_target';
+      if (this.highlight_addr.asBoolean === true) usage = 'address';
+    }
+    this.#cells[addr].lastUse = usage;
+  }
+
+  public clearHighlights()
+  {
+    for (const cell of this.#cells)
+    {
+      cell.lastUse = 'none';
     }
   }
 
@@ -92,6 +128,8 @@ class MainMemoryView extends React.Component<{ c: MainMemory, d: Datapath }>
     const xfrm = 'translate(' + x + ',' + y + ')';
     return (
       <g transform={xfrm} className="component">
+        <rect x={0} y={0} width={30} height={500} />
+        <text className="label" x={10} y={250} textAnchor="middle" transform="rotate(90, 10, 250)">Main Memory</text>
       </g>);
   }
 };

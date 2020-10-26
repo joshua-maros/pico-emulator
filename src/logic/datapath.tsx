@@ -176,6 +176,7 @@ export class Datapath
   // Resets all components, propogating changes.
   public reset()
   {
+    this.clearHighlights();
     for (let c of this.#components)
     {
       c.reset();
@@ -205,6 +206,18 @@ export class Datapath
     }
     doWork(10);
     this.changeListener();
+  }
+
+  // Clears highlights showing things like the last usage of a particular
+  // register. This can be called at different times to allow for both showing
+  // register usages during individual steps in the datapath and cumulatively
+  // for an entire instruction in the programmer view.
+  public clearHighlights()
+  {
+    for (const c of this.components)
+    {
+      c.clearHighlights()
+    }
   }
 
   // Does a clock signal without doing eval before or after.

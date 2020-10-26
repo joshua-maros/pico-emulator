@@ -41,7 +41,6 @@ export class Latch extends LogicComponent
 
   public evalClock()
   {
-    this.data.clearLastUse();
     if (this.load.asBoolean === true)
     {
       if (this.nbits === undefined)
@@ -61,9 +60,17 @@ export class Latch extends LogicComponent
           this.data.value = undefined;
         }
       }
-      this.data.lastUse = 'write';
+      if (this.data.value === undefined)
+      {
+        this.data.lastUse = 'error';
+      }
+      else
+      {
+
+        this.data.lastUse = 'write';
+      }
     }
-    else if (this.data.value !== undefined && this.out.used)
+    else if (this.data.value !== undefined && this.out.used && this.data.lastUse === 'none')
     {
       this.data.lastUse = 'read';
     }
@@ -72,6 +79,10 @@ export class Latch extends LogicComponent
   public reset()
   {
     this.data.value = this.resetValue;
+  }
+
+  public clearHighlights()
+  {
     this.data.clearLastUse();
   }
 

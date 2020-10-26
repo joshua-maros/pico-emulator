@@ -34,6 +34,7 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
 
   private loadFile(event: React.ChangeEvent<HTMLInputElement>)
   {
+    this.reset();
     const file = event.target.files?.item(0);
     if (!file) return;
     file.text().then((text: string) =>
@@ -117,8 +118,13 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
 
   private doStep()
   {
+    this.props.datapath.clearHighlights();
     this.props.datapath.clock();
     this.props.datapath.eval();
+    if (this.props.datapath.haltRequested)
+    {
+      this.stopClock();
+    }
     const datapathMode = this.state.datapathLayout;
     // In programmer view, we should step through entire instructions at a time.
     // In datapath view, we show the individual clock cycles that happen to 
@@ -136,10 +142,6 @@ export default class Root extends React.Component<{ datapath: Datapath }, { data
       {
         throw new Error('Decoder did not finish in 50 cycles, probably a programming error.');
       }
-    }
-    if (this.props.datapath.haltRequested)
-    {
-      this.stopClock();
     }
   }
 

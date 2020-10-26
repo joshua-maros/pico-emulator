@@ -1,13 +1,14 @@
 :root {
   --cell-border-weight: 2px;
   --cell-padding: 0.2em;
-  --selected: rgb(0, 108, 223);
+  --selected: #000;
 
   --read-bg: #c8e6c9;
-  --write-bg: #66bb6a;
-  --instruction-bg: #42a5f5;
+  --write-bg: #74ce79;
+  --instruction-bg: #6bb5f1;
   --jump-target-bg: #bbdefb;
   --error-bg: #ef5350;
+  --address-bg: #e1bee7;
 
   --info-text: #0d47a1;
   --info-text-bg: #e3f2fd;
@@ -78,20 +79,34 @@ code {
   stroke-width: 1px;
 }
 
-.datapath .use_read {
+.use_read {
   fill: var(--read-bg);
+  background: var(--read-bg);
 }
 
-.datapath .use_write {
+.use_write {
   fill: var(--write-bg);
+  background: var(--write-bg);
 }
 
-.datapath .use_write {
-  fill: var(--write-bg);
+.use_instruction {
+  fill: var(--instruction-bg);
+  background: var(--instruction-bg);
 }
 
-.datapath .use_write {
-  fill: var(--write-bg);
+.use_jump_target {
+  fill: var(--jump-target-bg);
+  background: var(--jump-target-bg);
+}
+
+.use_error {
+  fill: var(--error-bg);
+  background: var(--error-bg);
+}
+
+.use_address {
+  fill: var(--address-bg);
+  background: var(--address-bg);
 }
 
 .datapath .label {

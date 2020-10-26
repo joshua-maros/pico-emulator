@@ -183,6 +183,11 @@ export abstract class LogicComponent
   // Called when the user requests the processor to be reset.
   public reset() { }
 
+  // Clear any highlights showing helpful information to the user. Multiple 
+  // clock cycles can pass between calls of this function to allow accumulation
+  // of highlights across an entire instruction.
+  public clearHighlights() { }
+
   // Connects the input with the given name to the provided bus, if it exists.
   // An error is thrown if it does not exist.
   public connectInput(name: string, bus: Bus)

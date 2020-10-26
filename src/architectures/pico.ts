@@ -12,8 +12,8 @@ const x3 = x0 + 40;
 const y3 = y0 + 260;
 
 export const PICO: DatapathDef = {
-  width: 770,
-  height: 550,
+  width: 800,
+  height: 500,
   components: [
     {
       type: 'Mux',
@@ -442,7 +442,7 @@ export const PICO: DatapathDef = {
     {
       type: 'MainMemory',
       id: 'Mem',
-      x: x0 + 780,
+      x: x0 + 760,
       y: y0,
       databits: 12,
       addrbits: 7,
@@ -466,6 +466,33 @@ export const PICO: DatapathDef = {
       name: 'memw',
       x: x0 + 675,
       y: y0 + 125,
+      wid: 60,
+      top: false,
+    },
+    {
+      type: 'Control',
+      id: 'HltI',
+      name: 'hlti',
+      x: x0 + 675,
+      y: y0 + 390,
+      wid: 60,
+      top: false,
+    },
+    {
+      type: 'Control',
+      id: 'HltJ',
+      name: 'hltj',
+      x: x0 + 675,
+      y: y0 + 415,
+      wid: 60,
+      top: false,
+    },
+    {
+      type: 'Control',
+      id: 'HltA',
+      name: 'hlta',
+      x: x0 + 675,
+      y: y0 + 440,
       wid: 60,
       top: false,
     },
@@ -555,30 +582,29 @@ export const PICO: DatapathDef = {
       path: 'o 1 xy r 70 i 0 y ^ 0 x ; i 1 xy l 20 i 0 y ^ 1 x ; i 0 xy $ 0 $ 1 o 0 xy'
     },
     { inputs: ['MemR.out'], outputs: ['Mem.memr'], path: 'H' },
-    {
-      inputs: ['MemW.out'],
-      outputs: ['Mem.memw'],
-      path: 'H'
-    }
+    { inputs: ['MemW.out'], outputs: ['Mem.memw'], path: 'H' },
+    { inputs: ['HltI.out'], outputs: ['Mem.highlight_instr'], path: 'H' },
+    { inputs: ['HltJ.out'], outputs: ['Mem.highlight_jumpt'], path: 'H' },
+    { inputs: ['HltA.out'], outputs: ['Mem.highlight_addr'], path: 'H' },
   ],
   microcode: {
     clockCycleNames: ['t0 (fetch)', 't1', 't2', 't3', 't4'],
-    fetchCycleStep: 'rdpca,aout,memr,din,ldir',
+    fetchCycleStep: 'rdpca,aout,memr,din,ldir,hlti',
     instructions: [
       'AND;rdir,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
       'ANDI;fldpc;rdpca,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
-      'ANDR;rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
+      'ANDR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:AND,fop:LDZ,lda;fldpc',
       'TAD;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
-      'TADI;fldpc;rdir,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
-      'TADR;rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'TADI;fldpc;rdpca,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
+      'TADR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
       'ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ',
-      'ISZR;fldpc,rdir,aout,memr,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ',
+      'ISZR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ',
       'DCA;rdir,aout,memw,rda,dout;op:ZERO,lda;fldpc',
-      'DCAR;rdir,aout,memr,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
-      'JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc',
-      'JMSR;fldpc,rdir,aout,memr,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc',
-      'JMP;rdir,incsel,fldpc;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
-      'JMPR;rdir,aout,memr,din,psel,fldpc',
+      'DCAR;rdir,aout,memr,hlta,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+      'JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc;rdpca,aout,hltj',
+      'JMSR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc;rdpca,aout,hltj',
+      'JMP;rdir,incsel,fldpc,aout,hltj;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
+      'JMPR;rdir,aout,memr,hlta,din,psel,fldpc;rdpca,aout,hltj',
       'NOP;fldpc',
       'IAC;op:INC,fop:LDALL,lda;fldpc',
       'RAL;op:RAL,fop:ROT,lda;fldpc',
