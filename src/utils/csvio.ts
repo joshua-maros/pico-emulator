@@ -77,9 +77,9 @@ function loadMem(mem: Array<MemoryCell>, file: string): string | null
         {
           return numberText + ' is not a valid number';
         }
-        if (currentIndex > 127)
+        if (currentIndex >= mem.length)
         {
-          return currentIndex + ' is too big, it is over 127';
+          return currentIndex + ' is too big, it is over ' + (mem.length - 1);
         }
         if (currentIndex < 0)
         {
@@ -99,7 +99,7 @@ function loadMem(mem: Array<MemoryCell>, file: string): string | null
         numberText = '';
         // Just silently discard the value. It is easier for the uset to see
         // what went wrong if they see part of their code thrown away.
-        if (currentIndex > 127) continue;
+        if (currentIndex >= mem.length) continue;
         // Remove extra whitespace.
         let trimmedData = trimQuotes(data.trim());
         // If the data is blank, do not load data and do not increment the

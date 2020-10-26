@@ -1,6 +1,6 @@
 // src/utils/PDP8e.js - JSON structure for building the PDP8e Datapath
 
-import { DatapathDef } from "./datapath";
+import { DatapathDef } from "../logic/datapath";
 
 const x0 = 0;
 const y0 = 0;
