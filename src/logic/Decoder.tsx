@@ -14,6 +14,9 @@ export interface UnparsedDecoderMicrocode
   instructions: Array<string>,
 }
 
+// This parses bits that come on ends of expressions embedded in messages as
+// parsed by parseCompleteMessage(). For example, this function would parse the
+// conditional portion in "<Flags?Skipped:Did not skip> the next instruction."
 function makeProceduralPiece(input: string, valueSource: Output, datapath: Datapath): () => string
 {
   if (input.includes('-'))
@@ -66,15 +69,10 @@ function makeProceduralPiece(input: string, valueSource: Output, datapath: Datap
   }
 }
 
-function parseCompleteMessage(input: string, datapath: Datapath): { preferredCycle: number, generator: () => string }
+// This is responsible for parsing the description of a message that should display
+// when the instruction finishes executing.
+function parseMessageExpression(input: string, datapath: Datapath): () => string
 {
-  let preferredCycle = 0;
-  if (input.startsWith('('))
-  {
-    let s = input.split(')', 2);
-    preferredCycle = parseInt(s[0].slice(1).trim());
-    input = s.slice(1).join(')').trim();
-  }
   let pieces: Array<() => string> = [];
   let buffer = '';
   let parsingExpr = false;
@@ -120,7 +118,7 @@ function parseCompleteMessage(input: string, datapath: Datapath): { preferredCyc
     }
   }
   pieces.push(() => buffer);
-  const generator = () =>
+  return () =>
   {
     let result = '';
     for (const piece of pieces)
@@ -129,19 +127,40 @@ function parseCompleteMessage(input: string, datapath: Datapath): { preferredCyc
     }
     return result;
   };
-  return { preferredCycle, generator };
 }
 
-function parseControlList(input: string, datapath: Datapath): () => void
+class StepResult
+{
+  // If nextCycle is -1, indicates default.
+  constructor(public readonly makeMessage: boolean, public readonly nextCycleOverride: number) { }
+}
+
+// Parses a list of controls that will be activated during a cycle.
+function parseControlList(
+  cycleNames: Array<string>,
+  input: string,
+  datapath: Datapath,
+  isLast: boolean,
+  previousMessageOverride: boolean
+): () => StepResult
 {
   // Otherwise we will try and parse a control with a blank name.
-  if (input.trim().length === 0) return () => { };
+  if (input.trim().length === 0) return () => new StepResult(false, -1);
   let actions: Array<{ control: Control, value: number }> = [];
+  let makeMessage = false;
+  let cycleOverride = -1;
+  if (isLast)
+  {
+    cycleOverride = 0;
+    // Automatically generate the message on the last cycle, unless the user had
+    // previously set where the message should be generated.
+    makeMessage = !previousMessageOverride;
+  }
   for (const controlDesc of input.trim().split(','))
   {
     const parts = controlDesc.trim().split(':');
     const cname = parts[0];
-    let option: boolean | string = true;
+    let option: true | string = true;
     if (parts.length > 1)
     {
       option = parts[1];
@@ -157,7 +176,23 @@ function parseControlList(input: string, datapath: Datapath): () => void
         break;
       }
     }
-    if (!success)
+    if (cname === "!message")
+    {
+      makeMessage = true;
+    }
+    else if (cname === "!next")
+    {
+      if (option === true)
+      {
+        throw new Error('!next must be followed by the name of a cycle, E.G. !next:t1');
+      }
+      cycleOverride = cycleNames.indexOf(option);
+      if (cycleOverride === -1)
+      {
+        throw new Error('There is no cycle named ' + option);
+      }
+    }
+    else if (!success)
     {
       throw new Error('There is no control named ' + cname);
     }
@@ -168,6 +203,7 @@ function parseControlList(input: string, datapath: Datapath): () => void
     {
       control.setValue(value);
     }
+    return new StepResult(makeMessage, cycleOverride);
   };
 }
 
@@ -175,7 +211,8 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
 {
   const result = new DecoderMicrocode();
   result.clockCycleNames = input.clockCycleNames;
-  result.fetchCycleAction = parseControlList(input.fetchCycleStep, datapath);
+  const cnames = result.clockCycleNames;
+  result.fetchCycleAction = parseControlList(cnames, input.fetchCycleStep, datapath, false, false);
   for (const instr of input.instructions)
   {
     const parts = instr.trim().split(';');
@@ -186,10 +223,21 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
     {
       throw new Error('The instruction ' + opcode + ' has too many steps! Try adding another step to clockCycleNames.');
     }
+    let parsedSteps = [];
+    let pmo = false;
+    for (let i = 0; i < steps.length; i++)
+    {
+      let last = i === steps.length - 1;
+      let parsed = parseControlList(cnames, steps[i].trim(), datapath, last, pmo);
+      parsedSteps.push(parsed);
+      // Keep track of whether or not the user has specified on which cycle the
+      // message should be generated.
+      pmo = pmo || steps[i].includes('!message');
+    }
     result.instructions.push({
       opcode: opcode.trim(),
-      completeMessage: parseCompleteMessage(completeMessage, datapath),
-      steps: steps.map(step => parseControlList(step.trim(), datapath))
+      messageGenerator: parseMessageExpression(completeMessage, datapath),
+      steps: parsedSteps,
     });
   }
   return result;
@@ -198,14 +246,14 @@ function parseDecoderMicrocode(input: UnparsedDecoderMicrocode, datapath: Datapa
 class DecoderInstruction
 {
   opcode = "";
-  completeMessage = { preferredCycle: 0, generator: () => "" };
-  steps: Array<() => void> = [];
+  messageGenerator = () => "";
+  steps: Array<() => StepResult> = [];
 }
 
 class DecoderMicrocode
 {
   clockCycleNames: Array<string> = ['t0'];
-  fetchCycleAction = () => { };
+  fetchCycleAction = () => new StepResult(false, -1);
   instructions: Array<DecoderInstruction> = [];
 }
 
@@ -270,7 +318,7 @@ export class Decoder extends LogicComponent
     throw new ComponentUsageError(opcode + ' is not a valid instruction opcode.');
   }
 
-  private doCurrentStepAction()
+  private doCurrentStepAction(): StepResult
   {
     if (this.#currentCycle === 0)
     {
@@ -288,9 +336,10 @@ export class Decoder extends LogicComponent
       const steps = this.getCurrentInstruction().steps;
       if (this.#currentCycle - 1 < steps.length)
       {
-        steps[this.#currentCycle - 1]();
+        return steps[this.#currentCycle - 1]();
       }
     }
+    return new StepResult(false, -1);
   }
 
   public eval()
@@ -301,13 +350,13 @@ export class Decoder extends LogicComponent
     {
       c.reset();
     }
-    this.doCurrentStepAction();
+    const after = this.doCurrentStepAction();
     if (this.in.value !== undefined && this.in.value !== 'HLT')
     {
       const ci = this.getCurrentInstruction();
-      if (this.#currentCycle === ci.completeMessage.preferredCycle)
+      if (after.makeMessage)
       {
-        this.#lastInstrDesc = ci.completeMessage.generator();
+        this.#lastInstrDesc = ci.messageGenerator();
       }
     }
   }
@@ -315,12 +364,19 @@ export class Decoder extends LogicComponent
   public evalClock()
   {
     if (!this.#enabled) return;
-    this.#currentCycle += 1;
-    if (this.#currentCycle === this.#microcode.clockCycleNames.length)
+    const after = this.doCurrentStepAction();
+    if (after.nextCycleOverride >= 0)
     {
-      this.#currentCycle = 0;
-      this.#datapath.decoderCycleFinished = true;
+      this.#currentCycle = after.nextCycleOverride;
+    } else
+    {
+      this.#currentCycle += 1;
+      if (this.#currentCycle === this.#microcode.clockCycleNames.length)
+      {
+        this.#currentCycle = 0;
+      }
     }
+    this.#datapath.decoderCycleFinished = this.#currentCycle === 0;
   }
 
   // Call this after an instruction has completed to get a description of what
@@ -333,7 +389,7 @@ export class Decoder extends LogicComponent
     }
     else
     {
-    return this.#lastInstrDesc;
+      return this.#lastInstrDesc;
     }
   }
 

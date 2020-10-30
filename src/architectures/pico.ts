@@ -607,24 +607,24 @@ export const PICO: DatapathDef = {
       '<T> from MEM[<S>] is added to ACC.' +
       ';TADR;rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:ADD,fop:LDALL,lda;fldpc',
 
-      '(3)Incremented MEM[<ExIR>] to <T>, <Flags?skipped over:continued to> next instruction.' +
-      ';ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ;rdpca,aout,hltj',
-      '(4)Incremented MEM[<S>] to <T>, <Flags?skipped over:continued to> next instruction.' +
-      ';ISZR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ;rdpca,aout,hltj',
+      'Incremented MEM[<ExIR>] to <T>, <Flags?skipped over:continued to> next instruction.' +
+      ';ISZ;fldpc,rdir,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rdir,aout,memw,rdt,dout,cldpc,fop:RDZ,!message;rdpca,aout,hltj',
+      'Incremented MEM[<S>] to <T>, <Flags?skipped over:continued to> next instruction.' +
+      ';ISZR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memr,din,ldt;op:INCB,fop:LDZ,tsel,ldt;rds,aout,memw,rdt,dout,cldpc,fop:RDZ;rdpca,aout,hltj,!message',
 
-      '(1)Wrote <ACC> to MEM[<ExIR>] and cleared ACC.' +
-      ';DCA;rdir,aout,memw,rda,dout;op:ZERO,lda;fldpc',
-      '(2)Wrote <ACC> to MEM[<S>] and cleared ACC.' +
-      ';DCAR;rdir,aout,memr,hlta,din,lds;rds,aout,memw,rda,dout;op:ZERO,lda;fldpc',
+      'Wrote <ACC> to MEM[<ExIR>] and cleared ACC.' +
+      ';DCA;rdir,aout,memw,rda,dout,!message;op:ZERO,lda;fldpc',
+      'Wrote <ACC> to MEM[<S>] and cleared ACC.' +
+      ';DCAR;rdir,aout,memr,hlta,din,lds;rds,aout,memw,rda,dout,!message;op:ZERO,lda;fldpc',
 
       'Jumped to subroutine at MEM[<ExIR+1>], placing return address at MEM[<ExIR>].' +
       ';JMS;fldpc;rdir,aout,memw,rdpcb,dout;rdir,incsel,fldpc;rdpca,aout,hltj',
       'Jumped to subroutine at MEM[<S+1>], placing return address at MEM[<S>].' +
-      ';JMSR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc;rdpca,aout,hltj',
+      ';JMSR;fldpc,rdir,aout,memr,hlta,din,lds;rds,aout,memw,rdpcb,dout;rds,incsel,fldpc,!message;rdpca,aout,hltj',
       'Jumped to MEM[<PC>].' +
-      ';JMP;rdir,incsel,fldpc,aout,hltj;rdpcb,ldt;op:DECB,tsel,ldt;rdt,psel,fldpc',
+      ';JMP;rdir,incsel,fldpc,aout,hltj;rdpcb,ldt;op:DECB,tsel,ldt,!message;rdt,psel,fldpc',
       'Jumped to MEM[<PC>].' +
-      ';JMPR;rdir,aout,memr,hlta,din,psel,fldpc;rdpca,aout,hltj',
+      ';JMPR;rdir,aout,memr,hlta,din,psel,fldpc,!message;rdpca,aout,hltj',
 
       'Did nothing.;NOP;fldpc',
       'Incremented accumulator.;IAC;op:INC,fop:LDALL,lda;fldpc',
@@ -639,18 +639,18 @@ export const PICO: DatapathDef = {
       'Complemented carry flag.;CMC;fop:CMC;fldpc',
       'Skipped over the next instruction.;SKP;fldpc;fldpc',
 
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?not set:set>.' +
-      ';SCC;fop:RDNC,cldpc;fldpc;rdpca,aout,hltj',
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?set:not set>.' +
-      ';SCS;fop:RDC,cldpc;fldpc;rdpca,aout,hltj',
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?not set:set>.' +
-      ';SZC;fop:RDNZ,cldpc;fldpc;rdpca,aout,hltj',
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?set:not set>.' +
-      ';SZS;fop:RDZ,cldpc;fldpc;rdpca,aout,hltj',
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?not set:set>.' +
-      ';SNC;fop:RDNN,cldpc;fldpc;rdpca,aout,hltj',
-      '(1)<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?set:not set>.' +
-      ';SNS;fop:RDN,cldpc;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?not set:set>.' +
+      ';SCC;fop:RDNC,cldpc,!message;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the carry flag was <Flags?set:not set>.' +
+      ';SCS;fop:RDC,cldpc,!message;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?not set:set>.' +
+      ';SZC;fop:RDNZ,cldpc,!message;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the zero flag was <Flags?set:not set>.' +
+      ';SZS;fop:RDZ,cldpc,!message;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?not set:set>.' +
+      ';SNC;fop:RDNN,cldpc,!message;fldpc;rdpca,aout,hltj',
+      '<Flags?Skipped over:Continued to> the next instruction because the negative flag was <Flags?set:not set>.' +
+      ';SNS;fop:RDN,cldpc,!message;fldpc;rdpca,aout,hltj',
 
       'Copied the value of Q into A.;MQA;asel,lda;fldpc',
       'Copied the value of A into Q.;MQL;rda,ldq;fldpc',
